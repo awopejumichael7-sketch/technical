@@ -1309,43 +1309,7 @@
   messagingSenderId: "754622637515",
   appId: "1:754622637515:web:6cacb74bbce5036121424e"
         };
-        // ============ MEMBERS CRUD ============
-        async function loadMembers() {
-            const snapshot = await db.collection('members').orderBy('name').get();
-            members = [];
-            snapshot.forEach(doc => members.push({ id: doc.id, ...doc.data() }));
-            displayMembers(members);
-            return members;
-        }
-
-        function displayMembers(membersToShow) {
-            let html = '';
-            membersToShow.forEach(member => {
-                const attendanceClass = (member.attendance || 0) >= 80 ? 'attendance-high' : (member.attendance >= 60 ? 'attendance-medium' : 'attendance-low');
-                html += `
-                    <div class="member-card">
-                        <div class="member-avatar">
-                            ${member.picture ? `<img src="${member.picture}" alt="${member.name}">` : '<i class="fas fa-user fa-3x"></i>'}
-                        </div>
-                        <div class="member-info">
-                            <h3>${member.name}</h3>
-                            <div class="member-role">${member.role}</div>
-                            <div class="member-detail"><i class="fas fa-phone"></i> ${member.phone}</div>
-                            <div class="member-detail"><i class="fas fa-calendar"></i> Joined: ${member.joinDate}</div>
-                            <span class="attendance-badge ${attendanceClass}">
-                                <i class="fas fa-chart-line"></i> ${member.attendance || 0}% Attendance
-                            </span>
-                        </div>
-                        ${isAdminLoggedIn ? `
-                            <div class="member-actions">
-                                <button class="btn-icon" onclick="editMember('${member.id}')" title="Edit"><i class="fas fa-edit"></i></button>
-                                <button class="btn-icon" onclick="deleteMember('${member.id}')" title="Delete"><i class="fas fa-trash"></i></button>
-                                <button class="btn-icon" onclick="openAttendanceModal('${member.id}')" title="Mark Attendance"><i class="fas fa-calendar-check"></i></button>
-                            </div>
-                        ` : ''}
-                    </div>
-                `;
-            });
+        
         // ==================== DATA STRUCTURES ====================
         let members = [];
         let attendance = [];
