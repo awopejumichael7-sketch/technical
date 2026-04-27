@@ -7,12 +7,12 @@ import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-aut
 // Initialize Firebase and set up CRUD operations
 
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyAv_4jC5rP71JwH4qPQ5ob2BANQq0AX31w",
+  authDomain: "media-54712.firebaseapp.com",
+  projectId: "media-54712",
+  storageBucket: "media-54712.firebasestorage.app",
+  messagingSenderId: "754622637515",
+  appId: "1:754622637515:web:6cacb74bbce5036121424e"
 };
 
 // Initialize Firebase
