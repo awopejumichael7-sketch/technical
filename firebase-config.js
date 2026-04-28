@@ -1,7 +1,10 @@
-// Import Firebase modules
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+// Load Firebase compat modules so the existing namespaced API keeps working.
+import "https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js";
+import "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js";
+import "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js";
+import "https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js";
+
+const firebase = window.firebase;
 
 // Firebase Configuration
 // Initialize Firebase and set up CRUD operations
@@ -726,3 +729,20 @@ function onHelpdeskChange(callback) {
         callback(complaints);
     });
 }
+
+// Expose services for non-module scripts in index.html.
+window.firebase = firebase;
+window.db = db;
+window.storage = storage;
+window.membersService = membersService;
+window.attendanceService = attendanceService;
+window.galleryService = galleryService;
+window.requestsService = requestsService;
+window.helpdeskService = helpdeskService;
+window.showAlert = showAlert;
+window.onMembersChange = onMembersChange;
+window.onAttendanceChange = onAttendanceChange;
+window.onGalleryChange = onGalleryChange;
+window.onRequestsChange = onRequestsChange;
+window.onHelpdeskChange = onHelpdeskChange;
+
