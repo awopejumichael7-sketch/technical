@@ -1306,84 +1306,57 @@
         let isAdminLoggedIn = false;
         let currentLightboxIndex = 0;
 
-        // Load initial data
-        function loadInitialData() {
-            // Load members
-            const savedMembers = localStorage.getItem('cac_members');
-            if (savedMembers) {
-                members = JSON.parse(savedMembers);
-            } else {
-                members = [
-                    { id: 1, name: 'John Doe', role: 'Camera', phone: '+234 801 234 5678', joinDate: '2023-01-15', picture: '', attendance: 85 },
-                    { id: 2, name: 'Jane Smith', role: 'Sound', phone: '+234 802 345 6789', joinDate: '2023-02-20', picture: '', attendance: 92 },
-                    { id: 3, name: 'Mike Johnson', role: 'Projection', phone: '+234 803 456 7890', joinDate: '2023-03-10', picture: '', attendance: 78 },
-                    { id: 4, name: 'Sarah Williams', role: 'Streaming', phone: '+234 804 567 8901', joinDate: '2023-04-05', picture: '', attendance: 95 },
-                    { id: 5, name: 'David Brown', role: 'Media', phone: '+234 805 678 9012', joinDate: '2023-05-12', picture: '', attendance: 88 },
-                    { id: 6, name: 'Emily Davis', role: 'Technical', phone: '+234 806 789 0123', joinDate: '2023-06-18', picture: '', attendance: 82 }
-                ];
-            }
+        // Subscribe to Firestore so data syncs across browsers/devices.
+        // Each listener refreshes the local cache and re-renders the active view.
+        function subscribeToRemoteData() {
+            const refreshActive = () => {
+                const activeSection = document.querySelector('.nav-link.active')?.textContent.toLowerCase() || 'dashboard';
+                if (activeSection === 'dashboard') loadDashboard();
+                if (activeSection === 'members') loadMembers();
+                if (activeSection === 'attendance') loadAttendance();
+                if (activeSection === 'gallery') loadGallery();
+                if (activeSection === 'requests') loadRequests();
+                if (activeSection === 'helpdesk') loadComplaints();
+                if (activeSection === 'reports') loadReport();
+            };
 
-            // Load attendance
-            const savedAttendance = localStorage.getItem('cac_attendance');
-            if (savedAttendance) {
-                attendance = JSON.parse(savedAttendance);
-            } else {
-                const today = new Date().toISOString().split('T')[0];
-                attendance = [
-                    { id: 1, memberId: 1, date: today, meeting: 'Sunday', status: 'present', reason: '' },
-                    { id: 2, memberId: 2, date: today, meeting: 'Sunday', status: 'absent', reason: 'Sick' },
-                    { id: 3, memberId: 3, date: today, meeting: 'Sunday', status: 'present', reason: '' },
-                    { id: 4, memberId: 4, date: today, meeting: 'Sunday', status: 'excused', reason: 'Family emergency' },
-                    { id: 5, memberId: 5, date: today, meeting: 'Sunday', status: 'present', reason: '' },
-                    { id: 6, memberId: 6, date: today, meeting: 'Sunday', status: 'present', reason: '' }
-                ];
-            }
+            window.onMembersChange((data) => {
+                members = data.map(m => ({ attendance: 0, picture: '', ...m }));
+                refreshActive();
+            });
 
-            // Load requests
-            const savedRequests = localStorage.getItem('cac_requests');
-            if (savedRequests) {
-                requests = JSON.parse(savedRequests);
-            } else {
-                requests = [
-                    { id: 1, name: 'John Doe', type: 'equipment', title: 'New Camera Lens', description: 'Need 70-200mm lens', urgency: 'high', status: 'pending' },
-                    { id: 2, name: 'Jane Smith', type: 'media', title: 'Presentation Software', description: 'Need updated software', urgency: 'medium', status: 'approved' }
-                ];
-            }
+            // Attendance listener: orderBy("date") drops docs without a `date` field,
+            // so we read the raw collection instead to stay tolerant of older data shapes.
+            window.db.collection('attendance').onSnapshot((snapshot) => {
+                const records = [];
+                snapshot.forEach(doc => records.push({ id: doc.id, ...doc.data() }));
+                attendance = records;
+                refreshActive();
+            });
 
-            // Load complaints
-            const savedComplaints = localStorage.getItem('cac_complaints');
-            if (savedComplaints) {
-                complaints = JSON.parse(savedComplaints);
-            } else {
-                complaints = [
-                    { id: 1, name: 'Mike Johnson', category: 'technical', title: 'Sound System Issue', description: 'Feedback noise', status: 'open', response: '' },
-                    { id: 2, name: 'Sarah Williams', category: 'equipment', title: 'Projector Bulb', description: 'Needs replacement', status: 'in-progress', response: 'Technician notified' }
-                ];
-            }
+            window.onRequestsChange((data) => {
+                requests = data;
+                refreshActive();
+            });
 
-            // Load gallery
-            const savedGallery = localStorage.getItem('cac_gallery');
-            if (savedGallery) {
-                gallery = JSON.parse(savedGallery);
-            } else {
-                // Default gallery images (sample data)
-                gallery = [
-                    { id: 1, title: 'Sunday Service', description: 'Beautiful worship session', image: 'https://via.placeholder.com/400x300?text=Sunday+Service', date: '2024-03-10' },
-                    { id: 2, title: 'Technical Team', description: 'Our dedicated technical team at work', image: 'https://via.placeholder.com/400x300?text=Technical+Team', date: '2024-03-05' },
-                    { id: 3, title: 'Media Workshop', description: 'Training session for media volunteers', image: 'https://via.placeholder.com/400x300?text=Media+Workshop', date: '2024-02-28' }
-                ];
-            }
+            window.onHelpdeskChange((data) => {
+                complaints = data.map(c => ({ response: c.resolution || c.response || '', ...c }));
+                refreshActive();
+            });
 
-            saveAllData();
+            window.onGalleryChange((data) => {
+                // Map Firestore field names back to the shape the UI expects.
+                gallery = data.map(g => ({
+                    ...g,
+                    image: g.image || g.imageUrl || '',
+                    date: g.date || (g.createdAt && g.createdAt.toDate ? g.createdAt.toDate().toISOString().split('T')[0] : '')
+                }));
+                refreshActive();
+            });
         }
 
-        function saveAllData() {
-            localStorage.setItem('cac_members', JSON.stringify(members));
-            localStorage.setItem('cac_attendance', JSON.stringify(attendance));
-            localStorage.setItem('cac_requests', JSON.stringify(requests));
-            localStorage.setItem('cac_complaints', JSON.stringify(complaints));
-            localStorage.setItem('cac_gallery', JSON.stringify(gallery));
-        }
+        // Kept as a no-op for any legacy call sites. Firestore is the source of truth.
+        function saveAllData() {}
 
         // ==================== THEME MANAGEMENT ====================
         function toggleTheme() {
@@ -1518,7 +1491,7 @@
                             <div class="gallery-date"><i class="fas fa-calendar"></i> ${item.date}</div>
                             ${isAdminLoggedIn ? `
                                 <div class="gallery-actions">
-                                    <button class="btn-icon" onclick="deleteGalleryItem(${item.id})" title="Delete Photo">
+                                    <button class="btn-icon" onclick="deleteGalleryItem('${item.id}')" title="Delete Photo">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </div>
@@ -1567,46 +1540,41 @@
 
         document.getElementById('uploadForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            
+
             const title = document.getElementById('photoTitle').value;
             const description = document.getElementById('photoDescription').value;
             const imageFile = document.getElementById('photoImage').files[0];
-            
+
             if (!title || !imageFile) {
                 showNotification('Please provide title and image', 'error');
                 return;
             }
-            
+
             const reader = new FileReader();
-            reader.onload = function(e) {
-                const galleryItem = {
-                    id: Date.now(),
-                    title: title,
-                    description: description,
-                    image: e.target.result,
+            reader.onload = async function(ev) {
+                // Store the data URL on `image` (UI field) and `imageUrl` (firebase-config expects this).
+                // Galleries with very large images (>1MB after base64) may hit Firestore document limits;
+                // for those, switch to galleryService.addGalleryItem(itemData, imageFile) which uploads to Storage.
+                await window.galleryService.addGalleryItem({
+                    title,
+                    description,
+                    image: ev.target.result,
+                    imageUrl: ev.target.result,
                     date: new Date().toISOString().split('T')[0]
-                };
-                
-                gallery.unshift(galleryItem);
-                saveAllData();
+                });
                 closeUploadModal();
-                loadGallery();
-                showNotification('Photo uploaded successfully!', 'success');
             };
             reader.readAsDataURL(imageFile);
         });
 
-        function deleteGalleryItem(id) {
+        async function deleteGalleryItem(id) {
             if (!isAdminLoggedIn) {
                 showNotification('Please login as admin to delete photos', 'error');
                 return;
             }
-            
+
             if (confirm('Are you sure you want to delete this photo?')) {
-                gallery = gallery.filter(item => item.id !== id);
-                saveAllData();
-                loadGallery();
-                showNotification('Photo deleted successfully', 'success');
+                await window.galleryService.deleteGalleryItem(id);
             }
         }
 
@@ -1746,9 +1714,9 @@
                         </div>
                         ${isAdminLoggedIn ? `
                             <div class="member-actions">
-                                <button class="btn-icon" onclick="editMember(${member.id})" title="Edit"><i class="fas fa-edit"></i></button>
-                                <button class="btn-icon" onclick="deleteMember(${member.id})" title="Delete"><i class="fas fa-trash"></i></button>
-                                <button class="btn-icon" onclick="openAttendanceModal(${member.id})" title="Mark Attendance"><i class="fas fa-calendar-check"></i></button>
+                                <button class="btn-icon" onclick="editMember('${member.id}')" title="Edit"><i class="fas fa-edit"></i></button>
+                                <button class="btn-icon" onclick="deleteMember('${member.id}')" title="Delete"><i class="fas fa-trash"></i></button>
+                                <button class="btn-icon" onclick="openAttendanceModal('${member.id}')" title="Mark Attendance"><i class="fas fa-calendar-check"></i></button>
                             </div>
                         ` : ''}
                     </div>
@@ -1793,9 +1761,9 @@
                         </div>
                         ${isAdminLoggedIn ? `
                             <div class="member-actions">
-                                <button class="btn-icon" onclick="editMember(${member.id})"><i class="fas fa-edit"></i></button>
-                                <button class="btn-icon" onclick="deleteMember(${member.id})"><i class="fas fa-trash"></i></button>
-                                <button class="btn-icon" onclick="openAttendanceModal(${member.id})"><i class="fas fa-calendar-check"></i></button>
+                                <button class="btn-icon" onclick="editMember('${member.id}')"><i class="fas fa-edit"></i></button>
+                                <button class="btn-icon" onclick="deleteMember('${member.id}')"><i class="fas fa-trash"></i></button>
+                                <button class="btn-icon" onclick="openAttendanceModal('${member.id}')"><i class="fas fa-calendar-check"></i></button>
                             </div>
                         ` : ''}
                     </div>
@@ -1808,7 +1776,8 @@
             if (!isAdminLoggedIn) { showNotification('Please login as admin first', 'error'); return; }
             if (id) {
                 document.getElementById('memberModalTitle').textContent = 'Edit Member';
-                const member = members.find(m => m.id === id);
+                const member = members.find(m => String(m.id) === String(id));
+                if (!member) { showNotification('Member not found', 'error'); return; }
                 document.getElementById('memberId').value = member.id;
                 document.getElementById('memberName').value = member.name;
                 document.getElementById('memberRole').value = member.role;
@@ -1846,41 +1815,33 @@
             } else { saveMember(''); }
         });
 
-        function saveMember(pictureData) {
+        async function saveMember(pictureData) {
+            const existingId = document.getElementById('memberId').value;
+            const existing = existingId ? members.find(m => String(m.id) === String(existingId)) : null;
             const memberData = {
-                id: document.getElementById('memberId').value ? parseInt(document.getElementById('memberId').value) : Date.now(),
                 name: document.getElementById('memberName').value,
                 role: document.getElementById('memberRole').value,
                 phone: document.getElementById('memberPhone').value,
                 joinDate: document.getElementById('memberJoinDate').value,
-                picture: pictureData,
-                attendance: 0
+                picture: pictureData || (existing ? existing.picture || '' : ''),
+                attendance: existing ? existing.attendance || 0 : 0
             };
-            if (document.getElementById('memberId').value) {
-                const index = members.findIndex(m => m.id === memberData.id);
-                members[index] = { ...members[index], ...memberData };
-                showNotification('Member updated successfully', 'success');
+            if (existingId) {
+                await window.membersService.updateMember(existingId, memberData);
             } else {
-                members.push(memberData);
-                showNotification('Member added successfully', 'success');
+                await window.membersService.addMember(memberData);
             }
-            saveAllData();
             closeMemberModal();
-            loadMembers();
-            loadDashboard();
+            // The onSnapshot listener will refresh the UI once Firestore confirms the write.
         }
 
-        function deleteMember(id) {
+        async function deleteMember(id) {
             if (!isAdminLoggedIn) { showNotification('Please login as admin', 'error'); return; }
-            if (confirm('Are you sure?')) {
-                members = members.filter(m => m.id !== id);
-                attendance = attendance.filter(a => a.memberId !== id);
-                saveAllData();
-                loadMembers();
-                loadDashboard();
-                loadAttendance();
-                showNotification('Member deleted', 'success');
-            }
+            if (!confirm('Are you sure?')) return;
+            await window.membersService.deleteMember(id);
+            // Clean up attendance rows that referenced this member.
+            const stale = attendance.filter(a => String(a.memberId) === String(id));
+            await Promise.all(stale.map(a => window.attendanceService.deleteAttendance(a.id)));
         }
         function editMember(id) { openMemberModal(id); }
 
@@ -1929,7 +1890,7 @@
         function openAttendanceModal(memberId = null) {
             if (!isAdminLoggedIn) { showNotification('Please login as admin first', 'error'); return; }
             let options = '';
-            members.forEach(member => { options += `<option value="${member.id}" ${memberId == member.id ? 'selected' : ''}>${member.name}</option>`; });
+            members.forEach(member => { options += `<option value="${member.id}" ${String(memberId) === String(member.id) ? 'selected' : ''}>${member.name}</option>`; });
             document.getElementById('attendanceMember').innerHTML = options;
             document.getElementById('attendanceDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('attendanceId').value = '';
@@ -1945,48 +1906,45 @@
             document.getElementById('reasonGroup').style.display = (status === 'absent' || status === 'excused') ? 'block' : 'none';
         }
 
-        document.getElementById('attendanceForm').addEventListener('submit', function(e) {
+        document.getElementById('attendanceForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             if (!isAdminLoggedIn) { showNotification('Please login as admin', 'error'); closeAttendanceModal(); return; }
-            const memberId = parseInt(document.getElementById('attendanceMember').value);
+            const memberId = document.getElementById('attendanceMember').value;
             const status = document.getElementById('attendanceStatus').value;
             const reason = document.getElementById('attendanceReason').value;
             if ((status === 'absent' || status === 'excused') && !reason) { showNotification('Please provide a reason', 'error'); return; }
             const attendanceData = {
-                id: document.getElementById('attendanceId').value || Date.now(),
-                memberId, date: document.getElementById('attendanceDate').value,
+                memberId,
+                date: document.getElementById('attendanceDate').value,
                 meeting: document.getElementById('attendanceMeeting').value,
-                status, reason
+                status,
+                reason
             };
-            if (document.getElementById('attendanceId').value) {
-                const index = attendance.findIndex(a => a.id == attendanceData.id);
-                attendance[index] = attendanceData;
-                showNotification('Attendance updated', 'success');
+            const existingId = document.getElementById('attendanceId').value;
+            if (existingId) {
+                await window.attendanceService.updateAttendance(existingId, attendanceData);
             } else {
-                attendance.push(attendanceData);
-                showNotification('Attendance marked', 'success');
+                await window.attendanceService.recordAttendance(attendanceData);
+                // Optimistically extend local cache so the percentage write below counts the new row.
+                attendance = [...attendance, { id: 'pending-' + Date.now(), ...attendanceData }];
             }
-            updateMemberAttendance(memberId);
-            saveAllData();
+            await updateMemberAttendance(memberId);
             closeAttendanceModal();
-            loadAttendance();
-            loadDashboard();
         });
 
-        function updateMemberAttendance(memberId) {
-            const memberAttendance = attendance.filter(a => a.memberId === memberId);
+        async function updateMemberAttendance(memberId) {
+            const memberAttendance = attendance.filter(a => String(a.memberId) === String(memberId));
             const present = memberAttendance.filter(a => a.status === 'present').length;
             const total = memberAttendance.length;
             const percentage = total > 0 ? Math.round((present / total) * 100) : 0;
-            const member = members.find(m => m.id === memberId);
-            if (member) member.attendance = percentage;
+            await window.membersService.updateMember(memberId, { attendance: percentage });
         }
 
         // ==================== REQUESTS FUNCTIONS ====================
         function loadRequests() {
             let html = '';
-            requests.sort((a, b) => b.id - a.id).forEach(request => {
-                html += `<div class="request-card priority-${request.urgency}"><div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem;"><div><div class="admin-badge-small">Submitted by: ${request.name}</div><h3>${request.title}</h3><p>${request.description}</p><div><span class="status-badge status-${request.status}">${request.status}</span><span class="status-badge priority-${request.urgency}">${request.urgency}</span></div></div>${isAdminLoggedIn ? `<div><button class="btn-icon" onclick="updateRequestStatus(${request.id}, 'approved')"><i class="fas fa-check"></i></button><button class="btn-icon" onclick="updateRequestStatus(${request.id}, 'declined')"><i class="fas fa-times"></i></button><button class="btn-icon" onclick="updateRequestStatus(${request.id}, 'completed')"><i class="fas fa-check-double"></i></button></div>` : ''}</div></div>`;
+            requests.forEach(request => {
+                html += `<div class="request-card priority-${request.urgency}"><div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem;"><div><div class="admin-badge-small">Submitted by: ${request.name}</div><h3>${request.title}</h3><p>${request.description}</p><div><span class="status-badge status-${request.status}">${request.status}</span><span class="status-badge priority-${request.urgency}">${request.urgency}</span></div></div>${isAdminLoggedIn ? `<div><button class="btn-icon" onclick="updateRequestStatus('${request.id}', 'approved')"><i class="fas fa-check"></i></button><button class="btn-icon" onclick="updateRequestStatus('${request.id}', 'declined')"><i class="fas fa-times"></i></button><button class="btn-icon" onclick="updateRequestStatus('${request.id}', 'completed')"><i class="fas fa-check-double"></i></button></div>` : ''}</div></div>`;
             });
             document.getElementById('requestsList').innerHTML = html;
         }
@@ -1996,34 +1954,36 @@
             const urgencyFilter = document.getElementById('requestUrgencyFilter').value;
             let filtered = requests.filter(r => (statusFilter === 'all' || r.status === statusFilter) && (urgencyFilter === 'all' || r.urgency === urgencyFilter));
             let html = '';
-            filtered.sort((a, b) => b.id - a.id).forEach(request => {
-                html += `<div class="request-card priority-${request.urgency}"><div><div class="admin-badge-small">Submitted by: ${request.name}</div><h3>${request.title}</h3><p>${request.description}</p><div><span class="status-badge status-${request.status}">${request.status}</span><span class="status-badge priority-${request.urgency}">${request.urgency}</span></div></div>${isAdminLoggedIn ? `<div><button class="btn-icon" onclick="updateRequestStatus(${request.id}, 'approved')"><i class="fas fa-check"></i></button><button class="btn-icon" onclick="updateRequestStatus(${request.id}, 'declined')"><i class="fas fa-times"></i></button><button class="btn-icon" onclick="updateRequestStatus(${request.id}, 'completed')"><i class="fas fa-check-double"></i></button></div>` : ''}</div>`;
+            filtered.forEach(request => {
+                html += `<div class="request-card priority-${request.urgency}"><div><div class="admin-badge-small">Submitted by: ${request.name}</div><h3>${request.title}</h3><p>${request.description}</p><div><span class="status-badge status-${request.status}">${request.status}</span><span class="status-badge priority-${request.urgency}">${request.urgency}</span></div></div>${isAdminLoggedIn ? `<div><button class="btn-icon" onclick="updateRequestStatus('${request.id}', 'approved')"><i class="fas fa-check"></i></button><button class="btn-icon" onclick="updateRequestStatus('${request.id}', 'declined')"><i class="fas fa-times"></i></button><button class="btn-icon" onclick="updateRequestStatus('${request.id}', 'completed')"><i class="fas fa-check-double"></i></button></div>` : ''}</div>`;
             });
             document.getElementById('requestsList').innerHTML = html;
         }
 
         function openPublicRequestModal() { document.getElementById('publicRequestModal').style.display = 'flex'; }
         function closePublicRequestModal() { document.getElementById('publicRequestModal').style.display = 'none'; }
-        document.getElementById('publicRequestForm').addEventListener('submit', function(e) {
+        document.getElementById('publicRequestForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            requests.push({ id: Date.now(), name: document.getElementById('publicRequestName').value, type: document.getElementById('publicRequestType').value, title: document.getElementById('publicRequestTitle').value, description: document.getElementById('publicRequestDescription').value, urgency: document.getElementById('publicRequestUrgency').value, status: 'pending' });
-            saveAllData();
+            await window.requestsService.submitRequest({
+                name: document.getElementById('publicRequestName').value,
+                type: document.getElementById('publicRequestType').value,
+                title: document.getElementById('publicRequestTitle').value,
+                description: document.getElementById('publicRequestDescription').value,
+                urgency: document.getElementById('publicRequestUrgency').value
+            });
             closePublicRequestModal();
-            loadRequests();
-            showNotification('Request submitted!', 'success');
             this.reset();
         });
 
-        function updateRequestStatus(id, status) {
-            const request = requests.find(r => r.id === id);
-            if (request) { request.status = status; saveAllData(); loadRequests(); showNotification(`Request ${status}`, 'success'); }
+        async function updateRequestStatus(id, status) {
+            await window.requestsService.updateRequestStatus(id, status);
         }
 
         // ==================== COMPLAINTS FUNCTIONS ====================
         function loadComplaints() {
             let html = '';
-            complaints.sort((a, b) => b.id - a.id).forEach(complaint => {
-                html += `<div class="request-card"><div><div class="admin-badge-small">Submitted by: ${complaint.name}</div><h3>${complaint.title}</h3><p>${complaint.description}</p><div><span class="status-badge status-${complaint.status}">${complaint.status}</span><span class="status-badge">${complaint.category}</span></div>${complaint.response ? `<div style="background: var(--bg-secondary); padding: 0.75rem; border-radius: 8px; margin-top: 0.5rem;"><strong>Response:</strong> ${complaint.response}</div>` : ''}</div>${isAdminLoggedIn ? `<div><button class="btn-icon" onclick="openResponseModal(${complaint.id})"><i class="fas fa-reply"></i></button><select onchange="updateComplaintStatus(${complaint.id}, this.value)"><option value="open" ${complaint.status === 'open' ? 'selected' : ''}>Open</option><option value="in-progress" ${complaint.status === 'in-progress' ? 'selected' : ''}>In Progress</option><option value="resolved" ${complaint.status === 'resolved' ? 'selected' : ''}>Resolved</option></select></div>` : ''}</div>`;
+            complaints.forEach(complaint => {
+                html += `<div class="request-card"><div><div class="admin-badge-small">Submitted by: ${complaint.name}</div><h3>${complaint.title}</h3><p>${complaint.description}</p><div><span class="status-badge status-${complaint.status}">${complaint.status}</span><span class="status-badge">${complaint.category}</span></div>${complaint.response ? `<div style="background: var(--bg-secondary); padding: 0.75rem; border-radius: 8px; margin-top: 0.5rem;"><strong>Response:</strong> ${complaint.response}</div>` : ''}</div>${isAdminLoggedIn ? `<div><button class="btn-icon" onclick="openResponseModal('${complaint.id}')"><i class="fas fa-reply"></i></button><select onchange="updateComplaintStatus('${complaint.id}', this.value)"><option value="open" ${complaint.status === 'open' ? 'selected' : ''}>Open</option><option value="in-progress" ${complaint.status === 'in-progress' ? 'selected' : ''}>In Progress</option><option value="resolved" ${complaint.status === 'resolved' ? 'selected' : ''}>Resolved</option></select></div>` : ''}</div>`;
             });
             document.getElementById('complaintsList').innerHTML = html;
         }
@@ -2033,26 +1993,29 @@
             const categoryFilter = document.getElementById('complaintCategoryFilter').value;
             let filtered = complaints.filter(c => (statusFilter === 'all' || c.status === statusFilter) && (categoryFilter === 'all' || c.category === categoryFilter));
             let html = '';
-            filtered.sort((a, b) => b.id - a.id).forEach(complaint => {
-                html += `<div class="request-card"><div><div class="admin-badge-small">Submitted by: ${complaint.name}</div><h3>${complaint.title}</h3><p>${complaint.description}</p><div><span class="status-badge status-${complaint.status}">${complaint.status}</span><span class="status-badge">${complaint.category}</span></div>${complaint.response ? `<div><strong>Response:</strong> ${complaint.response}</div>` : ''}</div>${isAdminLoggedIn ? `<div><button class="btn-icon" onclick="openResponseModal(${complaint.id})"><i class="fas fa-reply"></i></button><select onchange="updateComplaintStatus(${complaint.id}, this.value)"><option value="open" ${complaint.status === 'open' ? 'selected' : ''}>Open</option><option value="in-progress" ${complaint.status === 'in-progress' ? 'selected' : ''}>In Progress</option><option value="resolved" ${complaint.status === 'resolved' ? 'selected' : ''}>Resolved</option></select></div>` : ''}</div>`;
+            filtered.forEach(complaint => {
+                html += `<div class="request-card"><div><div class="admin-badge-small">Submitted by: ${complaint.name}</div><h3>${complaint.title}</h3><p>${complaint.description}</p><div><span class="status-badge status-${complaint.status}">${complaint.status}</span><span class="status-badge">${complaint.category}</span></div>${complaint.response ? `<div><strong>Response:</strong> ${complaint.response}</div>` : ''}</div>${isAdminLoggedIn ? `<div><button class="btn-icon" onclick="openResponseModal('${complaint.id}')"><i class="fas fa-reply"></i></button><select onchange="updateComplaintStatus('${complaint.id}', this.value)"><option value="open" ${complaint.status === 'open' ? 'selected' : ''}>Open</option><option value="in-progress" ${complaint.status === 'in-progress' ? 'selected' : ''}>In Progress</option><option value="resolved" ${complaint.status === 'resolved' ? 'selected' : ''}>Resolved</option></select></div>` : ''}</div>`;
             });
             document.getElementById('complaintsList').innerHTML = html;
         }
 
         function openPublicComplaintModal() { document.getElementById('publicComplaintModal').style.display = 'flex'; }
         function closePublicComplaintModal() { document.getElementById('publicComplaintModal').style.display = 'none'; }
-        document.getElementById('publicComplaintForm').addEventListener('submit', function(e) {
+        document.getElementById('publicComplaintForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            complaints.push({ id: Date.now(), name: document.getElementById('publicComplaintName').value, category: document.getElementById('publicComplaintCategory').value, title: document.getElementById('publicComplaintTitle').value, description: document.getElementById('publicComplaintDescription').value, status: 'open', response: '' });
-            saveAllData();
+            await window.helpdeskService.submitComplaint({
+                name: document.getElementById('publicComplaintName').value,
+                category: document.getElementById('publicComplaintCategory').value,
+                title: document.getElementById('publicComplaintTitle').value,
+                description: document.getElementById('publicComplaintDescription').value,
+                response: ''
+            });
             closePublicComplaintModal();
-            loadComplaints();
-            showNotification('Complaint submitted!', 'success');
             this.reset();
         });
 
         function openResponseModal(id) {
-            const complaint = complaints.find(c => c.id === id);
+            const complaint = complaints.find(c => String(c.id) === String(id));
             if (complaint) {
                 document.getElementById('responseComplaintId').value = id;
                 document.getElementById('responseStatus').value = complaint.status;
@@ -2061,22 +2024,16 @@
             }
         }
         function closeResponseModal() { document.getElementById('responseModal').style.display = 'none'; }
-        document.getElementById('responseForm').addEventListener('submit', function(e) {
+        document.getElementById('responseForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            const id = parseInt(document.getElementById('responseComplaintId').value);
-            const complaint = complaints.find(c => c.id === id);
-            if (complaint) {
-                complaint.status = document.getElementById('responseStatus').value;
-                complaint.response = document.getElementById('responseText').value;
-                saveAllData();
-                loadComplaints();
-                closeResponseModal();
-                showNotification('Response submitted', 'success');
-            }
+            const id = document.getElementById('responseComplaintId').value;
+            const status = document.getElementById('responseStatus').value;
+            const responseText = document.getElementById('responseText').value;
+            await window.helpdeskService.updateComplaintStatus(id, status, responseText);
+            closeResponseModal();
         });
-        function updateComplaintStatus(id, status) {
-            const complaint = complaints.find(c => c.id === id);
-            if (complaint) { complaint.status = status; saveAllData(); loadComplaints(); showNotification(`Status updated to ${status}`, 'success'); }
+        async function updateComplaintStatus(id, status) {
+            await window.helpdeskService.updateComplaintStatus(id, status);
         }
 
         // ==================== REPORT FUNCTIONS ====================
@@ -2139,9 +2096,19 @@
             if (event.target.classList.contains('lightbox-modal')) closeLightbox();
         };
 
-        loadInitialData();
-        showSection('dashboard');
+        // Wait for firebase-config.js (loaded as a module) to expose the services,
+        // then start the realtime subscriptions.
+        function startApp() {
+            if (window.membersService && window.db) {
+                subscribeToRemoteData();
+                showSection('dashboard');
+            } else {
+                setTimeout(startApp, 50);
+            }
+        }
+        startApp();
     </script>
 </body>
 </html>
+
 
