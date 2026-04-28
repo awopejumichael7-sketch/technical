@@ -1397,12 +1397,13 @@
         document.documentElement.setAttribute('data-theme', savedTheme);
 
         // ==================== NAVIGATION ====================
-        function showSection(section) {
+        function showSection(section, trigger = null) {
             document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
             document.getElementById(section + 'Section').style.display = 'block';
             
             document.querySelectorAll('.nav-link').forEach(item => item.classList.remove('active'));
-            event.currentTarget.classList.add('active');
+            const activeLink = trigger || document.querySelector(`.nav-link[onclick="showSection('${section}')"]`);
+            if (activeLink) activeLink.classList.add('active');
 
             if (section === 'dashboard') loadDashboard();
             if (section === 'members') loadMembers();
@@ -2143,3 +2144,4 @@
     </script>
 </body>
 </html>
+
