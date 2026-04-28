@@ -158,11 +158,16 @@ class AttendanceService {
     // CREATE - Record attendance
     async recordAttendance(attendanceData) {
         try {
-            const docRef = await db.collection(this.collection).add({
+            // Preserve any user-supplied `date` (the UI uses YYYY-MM-DD strings).
+            // Only fall back to a server timestamp if the caller didn't provide one.
+            const payload = {
                 ...attendanceData,
-                date: firebase.firestore.FieldValue.serverTimestamp(),
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
+            };
+            if (!attendanceData.date) {
+                payload.date = firebase.firestore.FieldValue.serverTimestamp();
+            }
+            const docRef = await db.collection(this.collection).add(payload);
             showAlert("Attendance recorded successfully", 'success');
             return docRef.id;
         } catch (error) {
