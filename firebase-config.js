@@ -6,7 +6,7 @@ import "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js";
 const firebase = window.firebase;
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAv_4jC5rP71JwH4qPQ5ob2BANQq0AX31w",
+  apiKey: "AIzaSyATTAIic4lYXJvv5Eq4Fd2UG9I6MJumLCU",
   authDomain: "media-54712.firebaseapp.com",
   projectId: "media-54712",
   storageBucket: "media-54712.firebasestorage.app",
