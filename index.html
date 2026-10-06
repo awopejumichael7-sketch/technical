@@ -3,2112 +3,311 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CAC Good Works | Technical & Media Unit</title>
-    <script type="module" src="firebase-config.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-        }
-
-        :root {
-            --bg-primary: #ffffff;
-            --bg-secondary: #f8f9fa;
-            --text-primary: #1a1a1a;
-            --text-secondary: #6c757d;
-            --accent-gold: #D4AF37;
-            --accent-gold-light: #f4e5c1;
-            --accent-gold-dark: #b8960c;
-            --shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
-            --card-bg: #ffffff;
-            --border: #e9ecef;
-            --hover-bg: #f1f3f5;
-            --success: #28a745;
-            --danger: #dc3545;
-            --warning: #ffc107;
-            --info: #17a2b8;
-        }
-
-        [data-theme="dark"] {
-            --bg-primary: #1a1a1a;
-            --bg-secondary: #2d2d2d;
-            --text-primary: #ffffff;
-            --text-secondary: #b0b0b0;
-            --accent-gold: #D4AF37;
-            --accent-gold-light: #3d3522;
-            --accent-gold-dark: #b8960c;
-            --shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3);
-            --card-bg: #2d2d2d;
-            --border: #404040;
-            --hover-bg: #3d3d3d;
-        }
-
-        body {
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            transition: background-color 0.3s ease, color 0.3s ease;
-            min-height: 100vh;
-        }
-
-        /* Main App Styles */
-        .app-container {
-            min-height: 100vh;
-        }
-
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 2rem;
-            background: var(--card-bg);
-            border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            backdrop-filter: blur(10px);
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--accent-gold);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .nav-menu {
-            display: flex;
-            gap: 0.5rem;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .nav-link {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-        }
-
-        .nav-link:hover, .nav-link.active {
-            color: var(--accent-gold);
-            background: var(--accent-gold-light);
-        }
-
-        .admin-badge {
-            background: var(--accent-gold);
-            color: #1a1a1a;
-            padding: 0.5rem 1.5rem;
-            border-radius: 30px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            border: 2px solid var(--accent-gold);
-        }
-
-        .admin-badge:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px -5px rgba(212, 175, 55, 0.3);
-            background: transparent;
-            color: var(--accent-gold);
-        }
-
-        .admin-badge.logged-in {
-            background: var(--success);
-            border-color: var(--success);
-            color: white;
-        }
-
-        .admin-badge.logged-in:hover {
-            background: transparent;
-            color: var(--success);
-        }
-
-        .theme-toggle {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 0.5rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--text-primary);
-            transition: all 0.3s ease;
-        }
-
-        .theme-toggle:hover {
-            transform: rotate(180deg);
-        }
-
-        .main-content {
-            padding: 2rem;
-        }
-
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .stat-card {
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 1.5rem;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-            transition: all 0.3s ease;
-            animation: slideIn 0.5s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px -10px rgba(212, 175, 55, 0.2);
-        }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-20px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        .stat-card h3 {
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: var(--text-secondary);
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-card .value {
-            font-size: 2rem;
-            font-weight: 600;
-            color: var(--accent-gold);
-        }
-
-        /* Section Header */
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .btn-primary {
-            background: var(--accent-gold);
-            color: #1a1a1a;
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px -5px rgba(212, 175, 55, 0.3);
-        }
-
-        .btn-primary:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .btn-secondary {
-            background: transparent;
-            color: var(--text-primary);
-            padding: 0.75rem 1.5rem;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-secondary:hover {
-            background: var(--accent-gold-light);
-            border-color: var(--accent-gold);
-        }
-
-        /* Gallery Grid */
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 1.5rem;
-            margin-top: 1rem;
-        }
-
-        .gallery-item {
-            background: var(--card-bg);
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-            transition: all 0.3s ease;
-            animation: fadeIn 0.5s ease;
-        }
-
-        .gallery-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px -10px rgba(212, 175, 55, 0.2);
-        }
-
-        .gallery-image {
-            width: 100%;
-            height: 250px;
-            object-fit: cover;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-        }
-
-        .gallery-image:hover {
-            transform: scale(1.05);
-        }
-
-        .gallery-info {
-            padding: 1rem;
-        }
-
-        .gallery-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--text-primary);
-        }
-
-        .gallery-description {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            margin-bottom: 0.5rem;
-        }
-
-        .gallery-date {
-            font-size: 0.8rem;
-            color: var(--accent-gold);
-            margin-bottom: 0.5rem;
-        }
-
-        .gallery-actions {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
-        }
-
-        /* Lightbox Modal */
-        .lightbox-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .lightbox-content {
-            max-width: 90%;
-            max-height: 90%;
-            position: relative;
-        }
-
-        .lightbox-image {
-            max-width: 100%;
-            max-height: 90vh;
-            object-fit: contain;
-            border-radius: 12px;
-        }
-
-        .lightbox-close {
-            position: absolute;
-            top: -40px;
-            right: 0;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 2rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .lightbox-close:hover {
-            color: var(--accent-gold);
-            transform: rotate(90deg);
-        }
-
-        .lightbox-nav {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            padding: 0 20px;
-        }
-
-        .lightbox-nav-btn {
-            background: rgba(0, 0, 0, 0.5);
-            color: white;
-            border: none;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 1.5rem;
-            transition: all 0.3s ease;
-        }
-
-        .lightbox-nav-btn:hover {
-            background: var(--accent-gold);
-            color: #1a1a1a;
-        }
-
-        /* Members Grid */
-        .members-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .member-card {
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 1.5rem;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-            transition: all 0.3s ease;
-        }
-
-        .member-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.2);
-        }
-
-        .member-avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background: var(--accent-gold-light);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 1rem;
-            overflow: hidden;
-            border: 3px solid var(--accent-gold);
-        }
-
-        .member-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .member-info h3 {
-            font-size: 1.2rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .member-role {
-            color: var(--accent-gold);
-            font-weight: 600;
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .member-detail {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            margin-bottom: 0.25rem;
-        }
-
-        .attendance-badge {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-top: 0.5rem;
-        }
-
-        .attendance-high {
-            background: rgba(40, 167, 69, 0.1);
-            color: var(--success);
-        }
-
-        .attendance-medium {
-            background: rgba(255, 193, 7, 0.1);
-            color: var(--warning);
-        }
-
-        .attendance-low {
-            background: rgba(220, 53, 69, 0.1);
-            color: var(--danger);
-        }
-
-        .member-actions {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .btn-icon {
-            padding: 0.5rem;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            background: transparent;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-icon:hover:not(:disabled) {
-            background: var(--accent-gold);
-            color: #1a1a1a;
-            border-color: var(--accent-gold);
-        }
-
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(5px);
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .modal-content {
-            background: var(--card-bg);
-            border-radius: 24px;
-            padding: 2rem;
-            width: 90%;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
-            animation: slideUp 0.3s ease;
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(50px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .close-btn {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--text-secondary);
-            transition: all 0.3s ease;
-        }
-
-        .close-btn:hover {
-            color: var(--accent-gold);
-            transform: rotate(90deg);
-        }
-
-        /* Form Styles */
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            transition: all 0.3s ease;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--accent-gold);
-            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
-        }
-
-        /* Table Styles */
-        .table-container {
-            overflow-x: auto;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th {
-            text-align: left;
-            padding: 1rem;
-            background: var(--bg-secondary);
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-
-        td {
-            padding: 1rem;
-            border-bottom: 1px solid var(--border);
-        }
-
-        /* Status Badges */
-        .status-badge {
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            display: inline-block;
-        }
-
-        .status-present {
-            background: rgba(40, 167, 69, 0.1);
-            color: var(--success);
-        }
-
-        .status-absent {
-            background: rgba(220, 53, 69, 0.1);
-            color: var(--danger);
-        }
-
-        .status-excused {
-            background: rgba(255, 193, 7, 0.1);
-            color: var(--warning);
-        }
-
-        .status-pending {
-            background: rgba(23, 162, 184, 0.1);
-            color: var(--info);
-        }
-
-        .status-approved {
-            background: rgba(40, 167, 69, 0.1);
-            color: var(--success);
-        }
-
-        .status-declined {
-            background: rgba(220, 53, 69, 0.1);
-            color: var(--danger);
-        }
-
-        .status-completed {
-            background: rgba(40, 167, 69, 0.1);
-            color: var(--success);
-        }
-
-        .status-open {
-            background: rgba(220, 53, 69, 0.1);
-            color: var(--danger);
-        }
-
-        .status-in-progress {
-            background: rgba(255, 193, 7, 0.1);
-            color: var(--warning);
-        }
-
-        .status-resolved {
-            background: rgba(40, 167, 69, 0.1);
-            color: var(--success);
-        }
-
-        .priority-high {
-            border-left: 4px solid var(--danger);
-        }
-
-        .priority-medium {
-            border-left: 4px solid var(--warning);
-        }
-
-        .priority-low {
-            border-left: 4px solid var(--success);
-        }
-
-        .request-card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            border: 1px solid var(--border);
-            transition: all 0.3s ease;
-        }
-
-        .request-card:hover {
-            transform: translateX(5px);
-            box-shadow: var(--shadow);
-        }
-
-        .filter-bar {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .top-bar {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            
-            .nav-menu {
-                justify-content: center;
-            }
-            
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .members-grid, .gallery-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .section-header {
-                flex-direction: column;
-                align-items: stretch;
-            }
-        }
-
-        .alert {
-            padding: 1rem;
-            border-radius: 12px;
-            margin-bottom: 1rem;
-            animation: slideIn 0.3s ease;
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-            min-width: 300px;
-        }
-
-        .alert-success {
-            background: rgba(40, 167, 69, 0.95);
-            border: 1px solid var(--success);
-            color: white;
-        }
-
-        .alert-error {
-            background: rgba(220, 53, 69, 0.95);
-            border: 1px solid var(--danger);
-            color: white;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: var(--border);
-            border-radius: 4px;
-            overflow: hidden;
-            margin: 0.5rem 0;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: var(--accent-gold);
-            border-radius: 4px;
-            transition: width 0.3s ease;
-        }
-
-        .admin-controls {
-            display: flex;
-            gap: 0.5rem;
-            align-items: center;
-        }
-
-        .admin-badge-small {
-            background: var(--accent-gold-light);
-            color: var(--accent-gold-dark);
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .meeting-day {
-            background: linear-gradient(135deg, var(--accent-gold-light) 0%, var(--card-bg) 100%);
-            border-left: 4px solid var(--accent-gold);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .meeting-day::after {
-            content: 'Today\'s Meeting';
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: var(--accent-gold);
-            color: #1a1a1a;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .public-submit-btn {
-            background: var(--accent-gold-light);
-            color: var(--accent-gold-dark);
-            border: 2px solid var(--accent-gold);
-        }
-
-        .public-submit-btn:hover {
-            background: var(--accent-gold);
-            color: #1a1a1a;
-        }
-    </style>
+    <title>Freely Given Media Team</title>
+    <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="config.js"></script>
+    <script type="module" src="firebase-config.js"></script>
+    <script defer src="drive-service.js"></script>
+    <script defer src="roster-data.js"></script>
+    <script defer src="app.js"></script>
 </head>
 <body>
-    <!-- Main App -->
-    <div class="app-container">
-        <!-- Top Navigation -->
-        <div class="top-bar">
-            <div class="logo">
-                <i class="fas fa-church"></i>
-                <span>CAC Good Works</span>
-            </div>
-            
-            <div class="nav-menu">
-                <div class="nav-link active" onclick="showSection('dashboard')">Dashboard</div>
-                <div class="nav-link" onclick="showSection('members')">Members</div>
-                <div class="nav-link" onclick="showSection('attendance')">Attendance</div>
-                <div class="nav-link" onclick="showSection('gallery')">Gallery</div>
-                <div class="nav-link" onclick="showSection('requests')">Requests</div>
-                <div class="nav-link" onclick="showSection('helpdesk')">Help Desk</div>
-                <div class="nav-link" onclick="showSection('reports')">Reports</div>
-                <div class="admin-badge" id="adminBadge" onclick="toggleAdminModal()">
-                    <i class="fas fa-lock" id="adminIcon"></i>
-                    <span id="adminText">Admin Login</span>
-                </div>
-                <div class="theme-toggle" onclick="toggleTheme()">
-                    <i class="fas fa-sun"></i>
-                    <i class="fas fa-moon"></i>
-                </div>
-            </div>
-        </div>
-
-        <!-- Main Content -->
-        <div class="main-content">
-            <!-- Dashboard Section -->
-            <div id="dashboardSection" class="section">
-                <h1 style="margin-bottom: 2rem;">Dashboard Overview</h1>
-                
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <h3>Total Members</h3>
-                        <div class="value" id="totalMembers">0</div>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Present This Week</h3>
-                        <div class="value" id="presentThisWeek">0</div>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Absent This Week</h3>
-                        <div class="value" id="absentThisWeek">0</div>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Attendance Percentage</h3>
-                        <div class="value" id="attendancePercentage">0%</div>
-                    </div>
-                </div>
-
-                <div class="stat-card" id="nextMeetingCard" style="margin-bottom: 2rem;">
-                    <h3>Next Meeting</h3>
-                    <div class="value" id="nextMeeting">Loading...</div>
-                    <div class="progress-bar" style="margin-top: 1rem;">
-                        <div class="progress-fill" id="meetingProgress" style="width: 0%;"></div>
-                    </div>
-                </div>
-
-                <div class="section-header">
-                    <h2>Today's Attendance</h2>
-                </div>
-                
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Member</th>
-                                <th>Role</th>
-                                <th>Status</th>
-                                <th>Reason</th>
-                            </tr>
-                        </thead>
-                        <tbody id="todayAttendanceTable"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Members Section -->
-            <div id="membersSection" class="section" style="display: none;">
-                <div class="section-header">
-                    <h1>Our Members</h1>
-                </div>
-                
-                <div class="filter-bar">
-                    <input type="text" class="form-control" placeholder="Search members..." id="memberSearch" style="flex: 1;" onkeyup="filterMembers()">
-                    <select class="form-control" id="roleFilter" onchange="filterMembers()" style="width: 200px;">
-                        <option value="">All Roles</option>
-                        <option value="Camera">Camera</option>
-                        <option value="Sound">Sound</option>
-                        <option value="Projection">Projection</option>
-                        <option value="Streaming">Streaming</option>
-                        <option value="Media">Media</option>
-                        <option value="Technical">Technical</option>
-                    </select>
-                </div>
-                
-                <div class="members-grid" id="membersGrid"></div>
-            </div>
-
-            <!-- Gallery Section -->
-            <div id="gallerySection" class="section" style="display: none;">
-                <div class="section-header">
-                    <h1><i class="fas fa-images"></i> Photo Gallery</h1>
-                    <button class="btn-primary public-submit-btn" onclick="openUploadModal()">
-                        <i class="fas fa-upload"></i> Upload Photo
-                    </button>
-                </div>
-
-                <div class="filter-bar">
-                    <input type="text" class="form-control" placeholder="Search gallery..." id="gallerySearch" style="flex: 1;" onkeyup="filterGallery()">
-                    <select class="form-control" id="gallerySort" onchange="sortGallery()" style="width: 150px;">
-                        <option value="newest">Newest First</option>
-                        <option value="oldest">Oldest First</option>
-                        <option value="az">A-Z</option>
-                    </select>
-                </div>
-
-                <div class="gallery-grid" id="galleryGrid">
-                    <!-- Gallery items will be inserted here -->
-                </div>
-            </div>
-
-            <!-- Attendance Section -->
-            <div id="attendanceSection" class="section" style="display: none;">
-                <div class="section-header">
-                    <h1>Attendance Records</h1>
-                    <div style="display: flex; gap: 1rem;">
-                        <select id="attendanceMeetingFilter" class="form-control" onchange="filterAttendance()">
-                            <option value="all">All Meetings</option>
-                            <option value="Sunday">Sunday</option>
-                            <option value="Wednesday">Wednesday</option>
-                            <option value="Saturday">Saturday</option>
-                        </select>
-                        <input type="date" id="attendanceDateFilter" class="form-control" onchange="filterAttendance()">
-                        <button class="btn-secondary" onclick="resetAttendanceFilter()">Reset</button>
-                    </div>
-                </div>
-
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Meeting</th>
-                                <th>Member</th>
-                                <th>Status</th>
-                                <th>Reason</th>
-                            </tr>
-                        </thead>
-                        <tbody id="attendanceTable"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Requests Section -->
-            <div id="requestsSection" class="section" style="display: none;">
-                <div class="section-header">
-                    <h1>Equipment & Media Requests</h1>
-                    <button class="btn-primary public-submit-btn" onclick="openPublicRequestModal()">
-                        <i class="fas fa-plus"></i> Submit Request
-                    </button>
-                </div>
-
-                <div class="filter-bar">
-                    <select class="form-control" id="requestStatusFilter" onchange="filterRequests()">
-                        <option value="all">All Status</option>
-                        <option value="pending">Pending</option>
-                        <option value="approved">Approved</option>
-                        <option value="declined">Declined</option>
-                        <option value="completed">Completed</option>
-                    </select>
-                    <select class="form-control" id="requestUrgencyFilter" onchange="filterRequests()">
-                        <option value="all">All Urgency</option>
-                        <option value="high">High</option>
-                        <option value="medium">Medium</option>
-                        <option value="low">Low</option>
-                    </select>
-                </div>
-
-                <div id="requestsList"></div>
-            </div>
-
-            <!-- Help Desk Section -->
-            <div id="helpdeskSection" class="section" style="display: none;">
-                <div class="section-header">
-                    <h1>Help Desk & Complaints</h1>
-                    <button class="btn-primary public-submit-btn" onclick="openPublicComplaintModal()">
-                        <i class="fas fa-plus"></i> Submit Complaint
-                    </button>
-                </div>
-
-                <div class="filter-bar">
-                    <select class="form-control" id="complaintStatusFilter" onchange="filterComplaints()">
-                        <option value="all">All Status</option>
-                        <option value="open">Open</option>
-                        <option value="in-progress">In Progress</option>
-                        <option value="resolved">Resolved</option>
-                    </select>
-                    <select class="form-control" id="complaintCategoryFilter" onchange="filterComplaints()">
-                        <option value="all">All Categories</option>
-                        <option value="technical">Technical Issue</option>
-                        <option value="equipment">Equipment Problem</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-
-                <div id="complaintsList"></div>
-            </div>
-
-            <!-- Reports Section -->
-            <div id="reportsSection" class="section" style="display: none;">
-                <div class="section-header">
-                    <h1>Monthly Attendance Reports</h1>
-                    <div style="display: flex; gap: 1rem;">
-                        <input type="month" id="reportMonth" class="form-control" value="2024-03">
-                    </div>
-                </div>
-
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Member</th>
-                                <th>Role</th>
-                                <th>Total Meetings</th>
-                                <th>Present</th>
-                                <th>Absent</th>
-                                <th>Excused</th>
-                                <th>Attendance %</th>
-                                <th>Reasons for Absence</th>
-                            </tr>
-                        </thead>
-                        <tbody id="reportTable"></tbody>
-                    </table>
-                </div>
-            </div>
+<div class="app-container">
+    <div class="top-bar">
+        <div class="logo"><i class="fas fa-video"></i><div>Freely Given Media Team<small>Videography · Photography · SRT</small></div></div>
+        <div class="nav-menu">
+            <div class="nav-link active" data-section="dashboard" onclick="showSection('dashboard')">Dashboard</div>
+            <div class="nav-link" data-section="roster" onclick="showSection('roster')">Duty Roster</div>
+            <div class="nav-link" data-section="members" onclick="showSection('members')">Team</div>
+            <div class="nav-link" data-section="attendance" onclick="showSection('attendance')">Attendance</div>
+            <div class="nav-link" data-section="gallery" onclick="showSection('gallery')">Gallery</div>
+            <div class="nav-link" data-section="requests" onclick="showSection('requests')">Requests</div>
+            <div class="nav-link" data-section="helpdesk" onclick="showSection('helpdesk')">Help Desk</div>
+            <div class="nav-link admin-only" data-section="performance" onclick="showSection('performance')" hidden>Performance</div>
+            <div class="nav-link" data-section="reports" onclick="showSection('reports')">Reports</div>
+            <div class="admin-badge" id="adminBadge" onclick="toggleAdminModal()"><i class="fas fa-lock" id="adminIcon"></i><span id="adminText">Admin Login</span></div>
+            <div class="theme-toggle" onclick="toggleTheme()" title="Toggle theme"><i class="fas fa-sun"></i><i class="fas fa-moon"></i></div>
         </div>
     </div>
 
-    <!-- Admin Login Modal -->
-    <div class="modal" id="adminLoginModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2><i class="fas fa-lock" style="color: var(--accent-gold);"></i> Admin Login</h2>
-                <button class="close-btn" onclick="closeAdminModal()">&times;</button>
+    <div class="main-content">
+        <div id="driveBanner" class="banner warn" hidden>
+            <strong>Google Drive is not connected yet.</strong> Photo uploads and the gallery are disabled until <code>DRIVE_API_URL</code> is set in <code>config.js</code>. See <code>SETUP.md</code>, step 2.
+        </div>
+
+        <!-- Dashboard -->
+        <div id="dashboardSection" class="section">
+            <h1 style="margin-bottom:.25rem;">Dashboard Overview</h1>
+            <p class="page-sub" style="margin-bottom:2rem;">Freely Given Media Team – conference coordination</p>
+            <div class="stats-grid">
+                <div class="stat-card"><h3>Team Members</h3><div class="value" id="totalMembers">0</div></div>
+                <div class="stat-card"><h3>Present This Week</h3><div class="value" id="presentThisWeek">0</div></div>
+                <div class="stat-card"><h3>Absent This Week</h3><div class="value" id="absentThisWeek">0</div></div>
+                <div class="stat-card"><h3>Attendance Percentage</h3><div class="value" id="attendancePercentage">0%</div></div>
             </div>
-            <form id="adminLoginForm">
-                <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" id="adminUsername" class="form-control" value="" placeholder="Enter username">
+            <div class="stat-card" id="nextMeetingCard" style="margin-bottom:2rem;">
+                <h3>Next Programme Day</h3>
+                <div class="value" id="nextMeeting">Loading...</div>
+                <div class="progress-bar" style="margin-top:1rem;"><div class="progress-fill" id="meetingProgress" style="width:0%;"></div></div>
+            </div>
+            <div class="section-header"><h2>Today's Assignments</h2></div>
+            <div id="todayAssignments" style="margin-bottom:2rem;"></div>
+            <div class="section-header"><h2>Today's Attendance</h2></div>
+            <div class="table-container"><table>
+                <thead><tr><th>Member</th><th>Role</th><th>Status</th><th>Reason</th></tr></thead>
+                <tbody id="todayAttendanceTable"></tbody>
+            </table></div>
+        </div>
+
+        <!-- Duty Roster -->
+        <div id="rosterSection" class="section" style="display:none;">
+            <div class="section-header">
+                <div><h1><i class="fas fa-clipboard-list"></i> Duty Roster</h1><p class="page-sub">Who is on duty, where, and what they are expected to do.</p></div>
+            </div>
+            <div class="day-tabs" id="rosterTabs"></div>
+            <div id="rosterBody"></div>
+        </div>
+
+        <!-- Team -->
+        <div id="membersSection" class="section" style="display:none;">
+            <div class="section-header"><h1>Our Team</h1></div>
+            <div id="phoneNotice"></div>
+            <div class="filter-bar">
+                <input type="text" class="form-control" placeholder="Search team..." id="memberSearch" style="flex:1;" onkeyup="loadMembers()">
+                <select class="form-control" id="roleFilter" onchange="loadMembers()" style="width:220px;"></select>
+            </div>
+            <div class="members-grid" id="membersGrid"></div>
+        </div>
+
+        <!-- Gallery -->
+        <div id="gallerySection" class="section" style="display:none;">
+            <div class="section-header">
+                <h1><i class="fas fa-images"></i> Photo Gallery</h1>
+                <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+                    <button class="btn-secondary" onclick="loadGallery(true)"><i class="fas fa-rotate"></i> Refresh</button>
+                    <button class="btn-primary public-submit-btn" onclick="openUploadModal()"><i class="fas fa-upload"></i> Upload Photo</button>
                 </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" id="adminPassword" class="form-control" value="" placeholder="Enter password">
+            </div>
+            <div class="album-tabs" id="albumTabs"></div>
+            <div class="filter-bar">
+                <input type="text" class="form-control" placeholder="Search gallery..." id="gallerySearch" style="flex:1;" onkeyup="renderGallery()">
+                <select class="form-control" id="gallerySort" onchange="renderGallery()" style="width:150px;">
+                    <option value="newest">Newest First</option><option value="oldest">Oldest First</option><option value="az">A-Z</option>
+                </select>
+            </div>
+            <div class="gallery-grid" id="galleryGrid"></div>
+        </div>
+
+        <!-- Attendance -->
+        <div id="attendanceSection" class="section" style="display:none;">
+            <div class="section-header">
+                <h1>Attendance Records</h1>
+                <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+                    <select id="attendanceMeetingFilter" class="form-control" onchange="loadAttendance()"></select>
+                    <input type="date" id="attendanceDateFilter" class="form-control" onchange="loadAttendance()">
+                    <button class="btn-secondary" onclick="resetAttendanceFilter()">Reset</button>
+                    <button class="btn-primary admin-only" id="markAttendanceBtn" onclick="openAttendanceModal()" hidden><i class="fas fa-plus"></i> Mark Attendance</button>
                 </div>
-                <button type="submit" class="btn-primary" style="width: 100%;">
-                    <i class="fas fa-sign-in-alt"></i> Login to Admin Panel
-                </button>
-            </form>
-            <p style="text-align: center; margin-top: 1rem; color: var(--text-secondary); font-size: 0.9rem;">
-              
-            </p>
+            </div>
+            <div class="table-container"><table>
+                <thead><tr><th>Date</th><th>Programme Day</th><th>Member</th><th>Status</th><th>Reason</th></tr></thead>
+                <tbody id="attendanceTable"></tbody>
+            </table></div>
+        </div>
+
+        <!-- Requests -->
+        <div id="requestsSection" class="section" style="display:none;">
+            <div class="section-header">
+                <h1>Equipment & Media Requests</h1>
+                <button class="btn-primary public-submit-btn" onclick="openPublicRequestModal()"><i class="fas fa-plus"></i> Submit Request</button>
+            </div>
+            <div class="filter-bar">
+                <select class="form-control" id="requestStatusFilter" onchange="loadRequests()">
+                    <option value="all">All Status</option><option value="pending">Pending</option><option value="approved">Approved</option><option value="declined">Declined</option><option value="completed">Completed</option>
+                </select>
+                <select class="form-control" id="requestUrgencyFilter" onchange="loadRequests()">
+                    <option value="all">All Urgency</option><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option>
+                </select>
+            </div>
+            <div id="requestsList"></div>
+        </div>
+
+        <!-- Help Desk -->
+        <div id="helpdeskSection" class="section" style="display:none;">
+            <div class="section-header">
+                <h1>Help Desk</h1>
+                <button class="btn-primary public-submit-btn" onclick="openPublicComplaintModal()"><i class="fas fa-plus"></i> New Ticket</button>
+            </div>
+            <div class="filter-bar">
+                <select class="form-control" id="complaintDeptFilter" onchange="loadComplaints()"></select>
+                <select class="form-control" id="complaintStatusFilter" onchange="loadComplaints()">
+                    <option value="all">All Status</option><option value="open">Open</option><option value="in-progress">In Progress</option><option value="resolved">Resolved</option>
+                </select>
+                <select class="form-control" id="complaintCategoryFilter" onchange="loadComplaints()">
+                    <option value="all">All Categories</option><option value="technical">Technical Issue</option><option value="equipment">Equipment Problem</option><option value="other">Other</option>
+                </select>
+            </div>
+            <div id="complaintsList"></div>
+        </div>
+
+        <!-- Performance (admin) -->
+        <div id="performanceSection" class="section" style="display:none;">
+            <div class="section-header"><div><h1><i class="fas fa-star"></i> Performance</h1><p class="page-sub">Appraisals and complaints recorded by admin after each day's duty. Visible to admins only.</p></div></div>
+            <div id="performanceBody"></div>
+        </div>
+
+        <!-- Reports -->
+        <div id="reportsSection" class="section" style="display:none;">
+            <div class="section-header">
+                <h1>Monthly Attendance Reports</h1>
+                <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+                    <input type="month" id="reportMonth" class="form-control" onchange="loadReport()">
+                    <button class="btn-primary admin-only" onclick="downloadReport('pdf')" hidden><i class="fas fa-file-pdf"></i> PDF</button>
+                    <button class="btn-primary admin-only" onclick="downloadReport('excel')" hidden><i class="fas fa-file-excel"></i> Excel (CSV)</button>
+                </div>
+            </div>
+            <div class="table-container"><table>
+                <thead><tr><th>Member</th><th>Role</th><th>Total</th><th>Present</th><th>Absent</th><th>Excused</th><th>Attendance %</th><th>Reasons for Absence</th></tr></thead>
+                <tbody id="reportTable"></tbody>
+            </table></div>
         </div>
     </div>
-
-    <!-- Upload Photo Modal -->
-    <div class="modal" id="uploadModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2><i class="fas fa-upload" style="color: var(--accent-gold);"></i> Upload Photo</h2>
-                <button class="close-btn" onclick="closeUploadModal()">&times;</button>
-            </div>
-            <form id="uploadForm" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label>Photo Title <span style="color: var(--danger);">*</span></label>
-                    <input type="text" id="photoTitle" class="form-control" required placeholder="Enter photo title">
-                </div>
-                <div class="form-group">
-                    <label>Description</label>
-                    <textarea id="photoDescription" class="form-control" rows="3" placeholder="Enter photo description (optional)"></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Select Image <span style="color: var(--danger);">*</span></label>
-                    <input type="file" id="photoImage" class="form-control" accept="image/*" required onchange="previewPhoto(this)">
-                    <div id="photoPreview" style="margin-top: 1rem; text-align: center; display: none;">
-                        <img src="" alt="Preview" style="max-width: 200px; max-height: 200px; border-radius: 12px;">
-                    </div>
-                </div>
-                <button type="submit" class="btn-primary" style="width: 100%;">
-                    <i class="fas fa-cloud-upload-alt"></i> Upload Photo
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Lightbox Modal for fullscreen viewing -->
-    <div class="lightbox-modal" id="lightboxModal">
-        <div class="lightbox-content">
-            <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
-            <img class="lightbox-image" id="lightboxImage" src="" alt="">
-            <div class="lightbox-nav">
-                <button class="lightbox-nav-btn" onclick="previousImage()">❮</button>
-                <button class="lightbox-nav-btn" onclick="nextImage()">❯</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Member Modal (Admin Only) -->
-    <div class="modal" id="memberModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="memberModalTitle">Add New Member</h2>
-                <button class="close-btn" onclick="closeMemberModal()">&times;</button>
-            </div>
-            <form id="memberForm" enctype="multipart/form-data">
-                <input type="hidden" id="memberId">
-                <div class="form-group">
-                    <label>Profile Picture</label>
-                    <input type="file" id="memberPicture" class="form-control" accept="image/*" onchange="previewImage(this)">
-                    <div id="imagePreview" style="margin-top: 0.5rem; text-align: center;"></div>
-                </div>
-                <div class="form-group">
-                    <label>Full Name</label>
-                    <input type="text" id="memberName" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label>Role</label>
-                    <select id="memberRole" class="form-control" required>
-                        <option value="Camera">Camera</option>
-                        <option value="Sound">Sound</option>
-                        <option value="Projection">Projection</option>
-                        <option value="Streaming">Streaming</option>
-                        <option value="Media">Media</option>
-                        <option value="Technical">Technical</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Phone Number</label>
-                    <input type="tel" id="memberPhone" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label>Join Date</label>
-                    <input type="date" id="memberJoinDate" class="form-control" required>
-                </div>
-                <button type="submit" class="btn-primary" style="width: 100%;">Save Member</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Attendance Modal (Admin Only) -->
-    <div class="modal" id="attendanceModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Mark Attendance</h2>
-                <button class="close-btn" onclick="closeAttendanceModal()">&times;</button>
-            </div>
-            <form id="attendanceForm">
-                <input type="hidden" id="attendanceId">
-                <div class="form-group">
-                    <label>Member</label>
-                    <select id="attendanceMember" class="form-control" required></select>
-                </div>
-                <div class="form-group">
-                    <label>Meeting Type</label>
-                    <select id="attendanceMeeting" class="form-control" required>
-                        <option value="Sunday">Sunday Service</option>
-                        <option value="Wednesday">Wednesday Service</option>
-                        <option value="Saturday">Saturday Service</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Date</label>
-                    <input type="date" id="attendanceDate" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label>Status</label>
-                    <select id="attendanceStatus" class="form-control" required onchange="toggleReasonField()">
-                        <option value="present">Present</option>
-                        <option value="absent">Absent</option>
-                        <option value="excused">Excused</option>
-                    </select>
-                </div>
-                <div class="form-group" id="reasonGroup" style="display: none;">
-                    <label>Reason for Absence</label>
-                    <textarea id="attendanceReason" class="form-control" rows="3"></textarea>
-                </div>
-                <button type="submit" class="btn-primary" style="width: 100%;">Save Attendance</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Public Request Modal -->
-    <div class="modal" id="publicRequestModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Submit Request</h2>
-                <button class="close-btn" onclick="closePublicRequestModal()">&times;</button>
-            </div>
-            <form id="publicRequestForm">
-                <div class="form-group">
-                    <label>Your Name</label>
-                    <input type="text" id="publicRequestName" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label>Request Type</label>
-                    <select id="publicRequestType" class="form-control" required>
-                        <option value="equipment">Equipment Request</option>
-                        <option value="media">Media Request</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Title</label>
-                    <input type="text" id="publicRequestTitle" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label>Description</label>
-                    <textarea id="publicRequestDescription" class="form-control" rows="3" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Urgency Level</label>
-                    <select id="publicRequestUrgency" class="form-control" required>
-                        <option value="low">Low</option>
-                        <option value="medium">Medium</option>
-                        <option value="high">High</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn-primary" style="width: 100%;">Submit Request</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Public Complaint Modal -->
-    <div class="modal" id="publicComplaintModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Submit Complaint</h2>
-                <button class="close-btn" onclick="closePublicComplaintModal()">&times;</button>
-            </div>
-            <form id="publicComplaintForm">
-                <div class="form-group">
-                    <label>Your Name</label>
-                    <input type="text" id="publicComplaintName" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label>Category</label>
-                    <select id="publicComplaintCategory" class="form-control" required>
-                        <option value="technical">Technical Issue</option>
-                        <option value="equipment">Equipment Problem</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Title</label>
-                    <input type="text" id="publicComplaintTitle" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label>Description</label>
-                    <textarea id="publicComplaintDescription" class="form-control" rows="3" required></textarea>
-                </div>
-                <button type="submit" class="btn-primary" style="width: 100%;">Submit Complaint</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Response Modal (Admin Only) -->
-    <div class="modal" id="responseModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Respond to Complaint</h2>
-                <button class="close-btn" onclick="closeResponseModal()">&times;</button>
-            </div>
-            <form id="responseForm">
-                <input type="hidden" id="responseComplaintId">
-                <div class="form-group">
-                    <label>Update Status</label>
-                    <select id="responseStatus" class="form-control" required>
-                        <option value="open">Open</option>
-                        <option value="in-progress">In Progress</option>
-                        <option value="resolved">Resolved</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Response / Comment</label>
-                    <textarea id="responseText" class="form-control" rows="4" required></textarea>
-                </div>
-                <button type="submit" class="btn-primary" style="width: 100%;">Submit Response</button>
-            </form>
-        </div>
-    </div>
-
-    <script>
-        // ==================== DATA STRUCTURES ====================
-        let members = [];
-        let attendance = [];
-        let requests = [];
-        let complaints = [];
-        let gallery = [];
-        let isAdminLoggedIn = false;
-        let currentLightboxIndex = 0;
-
-        // Subscribe to Firestore so data syncs across browsers/devices.
-        // Each listener refreshes the local cache and re-renders the active view.
-        function subscribeToRemoteData() {
-            const refreshActive = () => {
-                const activeSection = document.querySelector('.nav-link.active')?.textContent.toLowerCase() || 'dashboard';
-                if (activeSection === 'dashboard') loadDashboard();
-                if (activeSection === 'members') loadMembers();
-                if (activeSection === 'attendance') loadAttendance();
-                if (activeSection === 'gallery') loadGallery();
-                if (activeSection === 'requests') loadRequests();
-                if (activeSection === 'helpdesk') loadComplaints();
-                if (activeSection === 'reports') loadReport();
-            };
-
-            window.onMembersChange((data) => {
-                members = data.map(m => ({ attendance: 0, picture: '', ...m }));
-                refreshActive();
-            });
-
-            // Attendance listener: orderBy("date") drops docs without a `date` field,
-            // so we read the raw collection instead to stay tolerant of older data shapes.
-            window.db.collection('attendance').onSnapshot((snapshot) => {
-                const records = [];
-                snapshot.forEach(doc => records.push({ id: doc.id, ...doc.data() }));
-                attendance = records;
-                refreshActive();
-            });
-
-            window.onRequestsChange((data) => {
-                requests = data;
-                refreshActive();
-            });
-
-            window.onHelpdeskChange((data) => {
-                complaints = data.map(c => ({ response: c.resolution || c.response || '', ...c }));
-                refreshActive();
-            });
-
-            window.onGalleryChange((data) => {
-                // Map Firestore field names back to the shape the UI expects.
-                gallery = data.map(g => ({
-                    ...g,
-                    image: g.image || g.imageUrl || '',
-                    date: g.date || (g.createdAt && g.createdAt.toDate ? g.createdAt.toDate().toISOString().split('T')[0] : '')
-                }));
-                refreshActive();
-            });
-        }
-
-        // Kept as a no-op for any legacy call sites. Firestore is the source of truth.
-        function saveAllData() {}
-
-        // ==================== THEME MANAGEMENT ====================
-        function toggleTheme() {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-        }
-
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-
-        // ==================== NAVIGATION ====================
-        function showSection(section, trigger = null) {
-            document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
-            document.getElementById(section + 'Section').style.display = 'block';
-            
-            document.querySelectorAll('.nav-link').forEach(item => item.classList.remove('active'));
-            const activeLink = trigger || document.querySelector(`.nav-link[onclick="showSection('${section}')"]`);
-            if (activeLink) activeLink.classList.add('active');
-
-            if (section === 'dashboard') loadDashboard();
-            if (section === 'members') loadMembers();
-            if (section === 'attendance') loadAttendance();
-            if (section === 'gallery') loadGallery();
-            if (section === 'requests') loadRequests();
-            if (section === 'helpdesk') loadComplaints();
-            if (section === 'reports') loadReport();
-        }
-
-        // ==================== ADMIN AUTHENTICATION ====================
-        function toggleAdminModal() {
-            if (isAdminLoggedIn) {
-                if (confirm('Are you sure you want to logout?')) {
-                    logoutAdmin();
-                }
-            } else {
-                document.getElementById('adminLoginModal').style.display = 'flex';
-            }
-        }
-
-        function closeAdminModal() {
-            document.getElementById('adminLoginModal').style.display = 'none';
-        }
-
-        document.getElementById('adminLoginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const username = document.getElementById('adminUsername').value;
-            const password = document.getElementById('adminPassword').value;
-            
-            if (username === 'admin' && password === 'Admin@123') {
-                isAdminLoggedIn = true;
-                closeAdminModal();
-                updateAdminUI();
-                showNotification('Admin login successful!', 'success');
-                
-                const activeSection = document.querySelector('.nav-link.active')?.textContent.toLowerCase() || 'dashboard';
-                if (activeSection === 'dashboard') loadDashboard();
-                if (activeSection === 'members') loadMembers();
-                if (activeSection === 'attendance') loadAttendance();
-                if (activeSection === 'gallery') loadGallery();
-                if (activeSection === 'requests') loadRequests();
-                if (activeSection === 'helpdesk') loadComplaints();
-                if (activeSection === 'reports') loadReport();
-            } else {
-                showNotification('Invalid credentials!', 'error');
-            }
-        });
-
-        function logoutAdmin() {
-            isAdminLoggedIn = false;
-            updateAdminUI();
-            showNotification('Logged out successfully', 'success');
-            
-            const activeSection = document.querySelector('.nav-link.active')?.textContent.toLowerCase() || 'dashboard';
-            if (activeSection === 'dashboard') loadDashboard();
-            if (activeSection === 'members') loadMembers();
-            if (activeSection === 'attendance') loadAttendance();
-            if (activeSection === 'gallery') loadGallery();
-            if (activeSection === 'requests') loadRequests();
-            if (activeSection === 'helpdesk') loadComplaints();
-            if (activeSection === 'reports') loadReport();
-        }
-
-        function updateAdminUI() {
-            const adminBadge = document.getElementById('adminBadge');
-            const adminIcon = document.getElementById('adminIcon');
-            const adminText = document.getElementById('adminText');
-            
-            if (isAdminLoggedIn) {
-                adminBadge.classList.add('logged-in');
-                adminIcon.className = 'fas fa-lock-open';
-                adminText.textContent = 'Admin Logout';
-            } else {
-                adminBadge.classList.remove('logged-in');
-                adminIcon.className = 'fas fa-lock';
-                adminText.textContent = 'Admin Login';
-            }
-        }
-
-        // ==================== GALLERY FUNCTIONS ====================
-        function loadGallery() {
-            let filteredGallery = [...gallery];
-            
-            // Apply search filter
-            const searchTerm = document.getElementById('gallerySearch')?.value.toLowerCase() || '';
-            if (searchTerm) {
-                filteredGallery = filteredGallery.filter(item => 
-                    item.title.toLowerCase().includes(searchTerm) || 
-                    (item.description && item.description.toLowerCase().includes(searchTerm))
-                );
-            }
-            
-            // Apply sort
-            const sortBy = document.getElementById('gallerySort')?.value || 'newest';
-            if (sortBy === 'newest') {
-                filteredGallery.sort((a, b) => new Date(b.date) - new Date(a.date));
-            } else if (sortBy === 'oldest') {
-                filteredGallery.sort((a, b) => new Date(a.date) - new Date(b.date));
-            } else if (sortBy === 'az') {
-                filteredGallery.sort((a, b) => a.title.localeCompare(b.title));
-            }
-            
-            let html = '';
-            filteredGallery.forEach((item, index) => {
-                html += `
-                    <div class="gallery-item" data-id="${item.id}">
-                        <img src="${item.image}" alt="${item.title}" class="gallery-image" onclick="openLightbox(${index})">
-                        <div class="gallery-info">
-                            <div class="gallery-title">${item.title}</div>
-                            <div class="gallery-description">${item.description || 'No description'}</div>
-                            <div class="gallery-date"><i class="fas fa-calendar"></i> ${item.date}</div>
-                            ${isAdminLoggedIn ? `
-                                <div class="gallery-actions">
-                                    <button class="btn-icon" onclick="deleteGalleryItem('${item.id}')" title="Delete Photo">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            ` : ''}
-                        </div>
-                    </div>
-                `;
-            });
-            
-            if (filteredGallery.length === 0) {
-                html = '<div class="stat-card" style="text-align: center; grid-column: 1/-1;"><p>No photos in gallery yet. Click "Upload Photo" to add some!</p></div>';
-            }
-            
-            document.getElementById('galleryGrid').innerHTML = html;
-        }
-
-        function filterGallery() {
-            loadGallery();
-        }
-
-        function sortGallery() {
-            loadGallery();
-        }
-
-        function openUploadModal() {
-            document.getElementById('uploadModal').style.display = 'flex';
-            document.getElementById('uploadForm').reset();
-            document.getElementById('photoPreview').style.display = 'none';
-        }
-
-        function closeUploadModal() {
-            document.getElementById('uploadModal').style.display = 'none';
-        }
-
-        function previewPhoto(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const preview = document.getElementById('photoPreview');
-                    preview.style.display = 'block';
-                    preview.innerHTML = `<img src="${e.target.result}" style="max-width: 200px; max-height: 200px; border-radius: 12px;">`;
-                }
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        document.getElementById('uploadForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const title = document.getElementById('photoTitle').value;
-            const description = document.getElementById('photoDescription').value;
-            const imageFile = document.getElementById('photoImage').files[0];
-
-            if (!title || !imageFile) {
-                showNotification('Please provide title and image', 'error');
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = async function(ev) {
-                // Store the data URL on `image` (UI field) and `imageUrl` (firebase-config expects this).
-                // Galleries with very large images (>1MB after base64) may hit Firestore document limits;
-                // for those, switch to galleryService.addGalleryItem(itemData, imageFile) which uploads to Storage.
-                await window.galleryService.addGalleryItem({
-                    title,
-                    description,
-                    image: ev.target.result,
-                    imageUrl: ev.target.result,
-                    date: new Date().toISOString().split('T')[0]
-                });
-                closeUploadModal();
-            };
-            reader.readAsDataURL(imageFile);
-        });
-
-        async function deleteGalleryItem(id) {
-            if (!isAdminLoggedIn) {
-                showNotification('Please login as admin to delete photos', 'error');
-                return;
-            }
-
-            if (confirm('Are you sure you want to delete this photo?')) {
-                await window.galleryService.deleteGalleryItem(id);
-            }
-        }
-
-        // Lightbox functions
-        function openLightbox(index) {
-            currentLightboxIndex = index;
-            const filteredGallery = getFilteredGallery();
-            const image = filteredGallery[currentLightboxIndex];
-            if (image) {
-                document.getElementById('lightboxImage').src = image.image;
-                document.getElementById('lightboxModal').style.display = 'flex';
-            }
-        }
-
-        function closeLightbox() {
-            document.getElementById('lightboxModal').style.display = 'none';
-        }
-
-        function previousImage() {
-            const filteredGallery = getFilteredGallery();
-            if (currentLightboxIndex > 0) {
-                currentLightboxIndex--;
-                document.getElementById('lightboxImage').src = filteredGallery[currentLightboxIndex].image;
-            }
-        }
-
-        function nextImage() {
-            const filteredGallery = getFilteredGallery();
-            if (currentLightboxIndex < filteredGallery.length - 1) {
-                currentLightboxIndex++;
-                document.getElementById('lightboxImage').src = filteredGallery[currentLightboxIndex].image;
-            }
-        }
-
-        function getFilteredGallery() {
-            let filtered = [...gallery];
-            const searchTerm = document.getElementById('gallerySearch')?.value.toLowerCase() || '';
-            if (searchTerm) {
-                filtered = filtered.filter(item => 
-                    item.title.toLowerCase().includes(searchTerm) || 
-                    (item.description && item.description.toLowerCase().includes(searchTerm))
-                );
-            }
-            const sortBy = document.getElementById('gallerySort')?.value || 'newest';
-            if (sortBy === 'newest') {
-                filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
-            } else if (sortBy === 'oldest') {
-                filtered.sort((a, b) => new Date(a.date) - new Date(b.date));
-            } else if (sortBy === 'az') {
-                filtered.sort((a, b) => a.title.localeCompare(b.title));
-            }
-            return filtered;
-        }
-
-        // ==================== DASHBOARD FUNCTIONS ====================
-        function loadDashboard() {
-            document.getElementById('totalMembers').textContent = members.length;
-            
-            const today = new Date();
-            const weekAgo = new Date(today.setDate(today.getDate() - 7));
-            const thisWeekAttendance = attendance.filter(a => new Date(a.date) >= weekAgo);
-            const present = thisWeekAttendance.filter(a => a.status === 'present').length;
-            const absent = thisWeekAttendance.filter(a => a.status === 'absent').length;
-            const total = thisWeekAttendance.length;
-            
-            document.getElementById('presentThisWeek').textContent = present;
-            document.getElementById('absentThisWeek').textContent = absent;
-            document.getElementById('attendancePercentage').textContent = 
-                total > 0 ? Math.round((present / total) * 100) + '%' : '0%';
-
-            const meetingDays = ['Sunday', 'Wednesday', 'Saturday'];
-            const todayName = new Date().toLocaleDateString('en-US', { weekday: 'long' });
-            
-            let nextMeeting = '';
-            let daysUntilNext = 0;
-            
-            if (meetingDays.includes(todayName)) {
-                nextMeeting = `${todayName} (Today)`;
-                document.getElementById('nextMeetingCard').classList.add('meeting-day');
-            } else {
-                document.getElementById('nextMeetingCard').classList.remove('meeting-day');
-                const todayIndex = new Date().getDay();
-                const meetingIndices = meetingDays.map(day => {
-                    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-                    return days.indexOf(day);
-                });
-                
-                let nextMeetingIndex = meetingIndices.find(index => index > todayIndex);
-                if (nextMeetingIndex === undefined) {
-                    nextMeetingIndex = meetingIndices[0] + 7;
-                }
-                daysUntilNext = nextMeetingIndex - todayIndex;
-                nextMeeting = `${meetingDays[meetingIndices.indexOf(nextMeetingIndex % 7)]} (in ${daysUntilNext} days)`;
-            }
-            
-            document.getElementById('nextMeeting').textContent = nextMeeting;
-            document.getElementById('meetingProgress').style.width = daysUntilNext ? `${((7-daysUntilNext)/7)*100}%` : '100%';
-
-            loadTodayAttendance();
-        }
-
-        function loadTodayAttendance() {
-            const today = new Date().toISOString().split('T')[0];
-            const todayAttendance = attendance.filter(a => a.date === today);
-            
-            let html = '';
-            members.forEach(member => {
-                const record = todayAttendance.find(a => a.memberId === member.id);
-                html += `
-                    <tr>
-                        <td>${member.name}</td>
-                        <td>${member.role}</td>
-                        <td><span class="status-badge status-${record ? record.status : 'absent'}">${record ? record.status : 'Not marked'}</span></td>
-                        <td>${record && record.reason ? record.reason : '-'}</td>
-                    </tr>
-                `;
-            });
-            document.getElementById('todayAttendanceTable').innerHTML = html;
-        }
-
-        // ==================== MEMBERS FUNCTIONS ====================
-        function loadMembers() {
-            let html = '';
-            members.forEach(member => {
-                const attendanceClass = member.attendance >= 80 ? 'attendance-high' : (member.attendance >= 60 ? 'attendance-medium' : 'attendance-low');
-                html += `
-                    <div class="member-card">
-                        <div class="member-avatar">
-                            ${member.picture ? `<img src="${member.picture}" alt="${member.name}">` : '<i class="fas fa-user fa-3x"></i>'}
-                        </div>
-                        <div class="member-info">
-                            <h3>${member.name}</h3>
-                            <div class="member-role">${member.role}</div>
-                            <div class="member-detail"><i class="fas fa-phone"></i> ${member.phone}</div>
-                            <div class="member-detail"><i class="fas fa-calendar"></i> Joined: ${member.joinDate}</div>
-                            <span class="attendance-badge ${attendanceClass}"><i class="fas fa-chart-line"></i> ${member.attendance}% Attendance</span>
-                        </div>
-                        ${isAdminLoggedIn ? `
-                            <div class="member-actions">
-                                <button class="btn-icon" onclick="editMember('${member.id}')" title="Edit"><i class="fas fa-edit"></i></button>
-                                <button class="btn-icon" onclick="deleteMember('${member.id}')" title="Delete"><i class="fas fa-trash"></i></button>
-                                <button class="btn-icon" onclick="openAttendanceModal('${member.id}')" title="Mark Attendance"><i class="fas fa-calendar-check"></i></button>
-                            </div>
-                        ` : ''}
-                    </div>
-                `;
-            });
-            document.getElementById('membersGrid').innerHTML = html;
-            
-            const sectionHeader = document.querySelector('#membersSection .section-header');
-            if (isAdminLoggedIn && !document.getElementById('addMemberBtn')) {
-                const addBtn = document.createElement('button');
-                addBtn.className = 'btn-primary';
-                addBtn.id = 'addMemberBtn';
-                addBtn.innerHTML = '<i class="fas fa-user-plus"></i> Add Member';
-                addBtn.onclick = () => openMemberModal();
-                sectionHeader.appendChild(addBtn);
-            } else if (!isAdminLoggedIn && document.getElementById('addMemberBtn')) {
-                document.getElementById('addMemberBtn').remove();
-            }
-        }
-
-        function filterMembers() {
-            const searchTerm = document.getElementById('memberSearch').value.toLowerCase();
-            const roleFilter = document.getElementById('roleFilter').value;
-            const filteredMembers = members.filter(member => {
-                const matchesSearch = member.name.toLowerCase().includes(searchTerm);
-                const matchesRole = !roleFilter || member.role === roleFilter;
-                return matchesSearch && matchesRole;
-            });
-            
-            let html = '';
-            filteredMembers.forEach(member => {
-                const attendanceClass = member.attendance >= 80 ? 'attendance-high' : (member.attendance >= 60 ? 'attendance-medium' : 'attendance-low');
-                html += `
-                    <div class="member-card">
-                        <div class="member-avatar">${member.picture ? `<img src="${member.picture}">` : '<i class="fas fa-user fa-3x"></i>'}</div>
-                        <div class="member-info">
-                            <h3>${member.name}</h3>
-                            <div class="member-role">${member.role}</div>
-                            <div class="member-detail"><i class="fas fa-phone"></i> ${member.phone}</div>
-                            <div class="member-detail"><i class="fas fa-calendar"></i> Joined: ${member.joinDate}</div>
-                            <span class="attendance-badge ${attendanceClass}"><i class="fas fa-chart-line"></i> ${member.attendance}% Attendance</span>
-                        </div>
-                        ${isAdminLoggedIn ? `
-                            <div class="member-actions">
-                                <button class="btn-icon" onclick="editMember('${member.id}')"><i class="fas fa-edit"></i></button>
-                                <button class="btn-icon" onclick="deleteMember('${member.id}')"><i class="fas fa-trash"></i></button>
-                                <button class="btn-icon" onclick="openAttendanceModal('${member.id}')"><i class="fas fa-calendar-check"></i></button>
-                            </div>
-                        ` : ''}
-                    </div>
-                `;
-            });
-            document.getElementById('membersGrid').innerHTML = html;
-        }
-
-        function openMemberModal(id = null) {
-            if (!isAdminLoggedIn) { showNotification('Please login as admin first', 'error'); return; }
-            if (id) {
-                document.getElementById('memberModalTitle').textContent = 'Edit Member';
-                const member = members.find(m => String(m.id) === String(id));
-                if (!member) { showNotification('Member not found', 'error'); return; }
-                document.getElementById('memberId').value = member.id;
-                document.getElementById('memberName').value = member.name;
-                document.getElementById('memberRole').value = member.role;
-                document.getElementById('memberPhone').value = member.phone;
-                document.getElementById('memberJoinDate').value = member.joinDate;
-                if (member.picture) document.getElementById('imagePreview').innerHTML = `<img src="${member.picture}" style="max-width: 100px; max-height: 100px; border-radius: 50%;">`;
-            } else {
-                document.getElementById('memberModalTitle').textContent = 'Add New Member';
-                document.getElementById('memberForm').reset();
-                document.getElementById('memberId').value = '';
-                document.getElementById('imagePreview').innerHTML = '';
-            }
-            document.getElementById('memberModal').style.display = 'flex';
-        }
-
-        function closeMemberModal() { document.getElementById('memberModal').style.display = 'none'; }
-        function previewImage(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('imagePreview').innerHTML = `<img src="${e.target.result}" style="max-width: 100px; max-height: 100px; border-radius: 50%;">`;
-                }
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        document.getElementById('memberForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            if (!isAdminLoggedIn) { showNotification('Please login as admin', 'error'); closeMemberModal(); return; }
-            const pictureFile = document.getElementById('memberPicture').files[0];
-            if (pictureFile) {
-                const reader = new FileReader();
-                reader.onload = function(e) { saveMember(e.target.result); };
-                reader.readAsDataURL(pictureFile);
-            } else { saveMember(''); }
-        });
-
-        async function saveMember(pictureData) {
-            const existingId = document.getElementById('memberId').value;
-            const existing = existingId ? members.find(m => String(m.id) === String(existingId)) : null;
-            const memberData = {
-                name: document.getElementById('memberName').value,
-                role: document.getElementById('memberRole').value,
-                phone: document.getElementById('memberPhone').value,
-                joinDate: document.getElementById('memberJoinDate').value,
-                picture: pictureData || (existing ? existing.picture || '' : ''),
-                attendance: existing ? existing.attendance || 0 : 0
-            };
-            if (existingId) {
-                await window.membersService.updateMember(existingId, memberData);
-            } else {
-                await window.membersService.addMember(memberData);
-            }
-            closeMemberModal();
-            // The onSnapshot listener will refresh the UI once Firestore confirms the write.
-        }
-
-        async function deleteMember(id) {
-            if (!isAdminLoggedIn) { showNotification('Please login as admin', 'error'); return; }
-            if (!confirm('Are you sure?')) return;
-            await window.membersService.deleteMember(id);
-            // Clean up attendance rows that referenced this member.
-            const stale = attendance.filter(a => String(a.memberId) === String(id));
-            await Promise.all(stale.map(a => window.attendanceService.deleteAttendance(a.id)));
-        }
-        function editMember(id) { openMemberModal(id); }
-
-        // ==================== ATTENDANCE FUNCTIONS ====================
-        function loadAttendance() {
-            let html = '';
-            attendance.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(record => {
-                const member = members.find(m => m.id === record.memberId);
-                html += `<tr><td>${record.date}</td><td>${record.meeting}</td><td>${member ? member.name : 'Unknown'}</td><td><span class="status-badge status-${record.status}">${record.status}</span></td><td>${record.reason || '-'}</td></tr>`;
-            });
-            document.getElementById('attendanceTable').innerHTML = html;
-            
-            if (isAdminLoggedIn && !document.getElementById('markAttendanceBtn')) {
-                const sectionHeader = document.querySelector('#attendanceSection .section-header');
-                const markBtn = document.createElement('button');
-                markBtn.className = 'btn-primary';
-                markBtn.id = 'markAttendanceBtn';
-                markBtn.innerHTML = '<i class="fas fa-plus"></i> Mark Attendance';
-                markBtn.onclick = () => openAttendanceModal();
-                sectionHeader.appendChild(markBtn);
-            } else if (!isAdminLoggedIn && document.getElementById('markAttendanceBtn')) {
-                document.getElementById('markAttendanceBtn').remove();
-            }
-        }
-
-        function filterAttendance() {
-            const meetingFilter = document.getElementById('attendanceMeetingFilter').value;
-            const dateFilter = document.getElementById('attendanceDateFilter').value;
-            let filteredAttendance = [...attendance];
-            if (meetingFilter !== 'all') filteredAttendance = filteredAttendance.filter(a => a.meeting === meetingFilter);
-            if (dateFilter) filteredAttendance = filteredAttendance.filter(a => a.date === dateFilter);
-            let html = '';
-            filteredAttendance.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(record => {
-                const member = members.find(m => m.id === record.memberId);
-                html += `<tr><td>${record.date}</td><td>${record.meeting}</td><td>${member ? member.name : 'Unknown'}</td><td><span class="status-badge status-${record.status}">${record.status}</span></td><td>${record.reason || '-'}</td></tr>`;
-            });
-            document.getElementById('attendanceTable').innerHTML = html;
-        }
-
-        function resetAttendanceFilter() {
-            document.getElementById('attendanceMeetingFilter').value = 'all';
-            document.getElementById('attendanceDateFilter').value = '';
-            loadAttendance();
-        }
-
-        function openAttendanceModal(memberId = null) {
-            if (!isAdminLoggedIn) { showNotification('Please login as admin first', 'error'); return; }
-            let options = '';
-            members.forEach(member => { options += `<option value="${member.id}" ${String(memberId) === String(member.id) ? 'selected' : ''}>${member.name}</option>`; });
-            document.getElementById('attendanceMember').innerHTML = options;
-            document.getElementById('attendanceDate').value = new Date().toISOString().split('T')[0];
-            document.getElementById('attendanceId').value = '';
-            document.getElementById('attendanceReason').value = '';
-            document.getElementById('attendanceStatus').value = 'present';
-            document.getElementById('reasonGroup').style.display = 'none';
-            document.getElementById('attendanceModal').style.display = 'flex';
-        }
-
-        function closeAttendanceModal() { document.getElementById('attendanceModal').style.display = 'none'; }
-        function toggleReasonField() {
-            const status = document.getElementById('attendanceStatus').value;
-            document.getElementById('reasonGroup').style.display = (status === 'absent' || status === 'excused') ? 'block' : 'none';
-        }
-
-        document.getElementById('attendanceForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            if (!isAdminLoggedIn) { showNotification('Please login as admin', 'error'); closeAttendanceModal(); return; }
-            const memberId = document.getElementById('attendanceMember').value;
-            const status = document.getElementById('attendanceStatus').value;
-            const reason = document.getElementById('attendanceReason').value;
-            if ((status === 'absent' || status === 'excused') && !reason) { showNotification('Please provide a reason', 'error'); return; }
-            const attendanceData = {
-                memberId,
-                date: document.getElementById('attendanceDate').value,
-                meeting: document.getElementById('attendanceMeeting').value,
-                status,
-                reason
-            };
-            const existingId = document.getElementById('attendanceId').value;
-            if (existingId) {
-                await window.attendanceService.updateAttendance(existingId, attendanceData);
-            } else {
-                await window.attendanceService.recordAttendance(attendanceData);
-                // Optimistically extend local cache so the percentage write below counts the new row.
-                attendance = [...attendance, { id: 'pending-' + Date.now(), ...attendanceData }];
-            }
-            await updateMemberAttendance(memberId);
-            closeAttendanceModal();
-        });
-
-        async function updateMemberAttendance(memberId) {
-            const memberAttendance = attendance.filter(a => String(a.memberId) === String(memberId));
-            const present = memberAttendance.filter(a => a.status === 'present').length;
-            const total = memberAttendance.length;
-            const percentage = total > 0 ? Math.round((present / total) * 100) : 0;
-            await window.membersService.updateMember(memberId, { attendance: percentage });
-        }
-
-        // ==================== REQUESTS FUNCTIONS ====================
-        function loadRequests() {
-            let html = '';
-            requests.forEach(request => {
-                html += `<div class="request-card priority-${request.urgency}"><div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem;"><div><div class="admin-badge-small">Submitted by: ${request.name}</div><h3>${request.title}</h3><p>${request.description}</p><div><span class="status-badge status-${request.status}">${request.status}</span><span class="status-badge priority-${request.urgency}">${request.urgency}</span></div></div>${isAdminLoggedIn ? `<div><button class="btn-icon" onclick="updateRequestStatus('${request.id}', 'approved')"><i class="fas fa-check"></i></button><button class="btn-icon" onclick="updateRequestStatus('${request.id}', 'declined')"><i class="fas fa-times"></i></button><button class="btn-icon" onclick="updateRequestStatus('${request.id}', 'completed')"><i class="fas fa-check-double"></i></button></div>` : ''}</div></div>`;
-            });
-            document.getElementById('requestsList').innerHTML = html;
-        }
-
-        function filterRequests() {
-            const statusFilter = document.getElementById('requestStatusFilter').value;
-            const urgencyFilter = document.getElementById('requestUrgencyFilter').value;
-            let filtered = requests.filter(r => (statusFilter === 'all' || r.status === statusFilter) && (urgencyFilter === 'all' || r.urgency === urgencyFilter));
-            let html = '';
-            filtered.forEach(request => {
-                html += `<div class="request-card priority-${request.urgency}"><div><div class="admin-badge-small">Submitted by: ${request.name}</div><h3>${request.title}</h3><p>${request.description}</p><div><span class="status-badge status-${request.status}">${request.status}</span><span class="status-badge priority-${request.urgency}">${request.urgency}</span></div></div>${isAdminLoggedIn ? `<div><button class="btn-icon" onclick="updateRequestStatus('${request.id}', 'approved')"><i class="fas fa-check"></i></button><button class="btn-icon" onclick="updateRequestStatus('${request.id}', 'declined')"><i class="fas fa-times"></i></button><button class="btn-icon" onclick="updateRequestStatus('${request.id}', 'completed')"><i class="fas fa-check-double"></i></button></div>` : ''}</div>`;
-            });
-            document.getElementById('requestsList').innerHTML = html;
-        }
-
-        function openPublicRequestModal() { document.getElementById('publicRequestModal').style.display = 'flex'; }
-        function closePublicRequestModal() { document.getElementById('publicRequestModal').style.display = 'none'; }
-        document.getElementById('publicRequestForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            await window.requestsService.submitRequest({
-                name: document.getElementById('publicRequestName').value,
-                type: document.getElementById('publicRequestType').value,
-                title: document.getElementById('publicRequestTitle').value,
-                description: document.getElementById('publicRequestDescription').value,
-                urgency: document.getElementById('publicRequestUrgency').value
-            });
-            closePublicRequestModal();
-            this.reset();
-        });
-
-        async function updateRequestStatus(id, status) {
-            await window.requestsService.updateRequestStatus(id, status);
-        }
-
-        // ==================== COMPLAINTS FUNCTIONS ====================
-        function loadComplaints() {
-            let html = '';
-            complaints.forEach(complaint => {
-                html += `<div class="request-card"><div><div class="admin-badge-small">Submitted by: ${complaint.name}</div><h3>${complaint.title}</h3><p>${complaint.description}</p><div><span class="status-badge status-${complaint.status}">${complaint.status}</span><span class="status-badge">${complaint.category}</span></div>${complaint.response ? `<div style="background: var(--bg-secondary); padding: 0.75rem; border-radius: 8px; margin-top: 0.5rem;"><strong>Response:</strong> ${complaint.response}</div>` : ''}</div>${isAdminLoggedIn ? `<div><button class="btn-icon" onclick="openResponseModal('${complaint.id}')"><i class="fas fa-reply"></i></button><select onchange="updateComplaintStatus('${complaint.id}', this.value)"><option value="open" ${complaint.status === 'open' ? 'selected' : ''}>Open</option><option value="in-progress" ${complaint.status === 'in-progress' ? 'selected' : ''}>In Progress</option><option value="resolved" ${complaint.status === 'resolved' ? 'selected' : ''}>Resolved</option></select></div>` : ''}</div>`;
-            });
-            document.getElementById('complaintsList').innerHTML = html;
-        }
-
-        function filterComplaints() {
-            const statusFilter = document.getElementById('complaintStatusFilter').value;
-            const categoryFilter = document.getElementById('complaintCategoryFilter').value;
-            let filtered = complaints.filter(c => (statusFilter === 'all' || c.status === statusFilter) && (categoryFilter === 'all' || c.category === categoryFilter));
-            let html = '';
-            filtered.forEach(complaint => {
-                html += `<div class="request-card"><div><div class="admin-badge-small">Submitted by: ${complaint.name}</div><h3>${complaint.title}</h3><p>${complaint.description}</p><div><span class="status-badge status-${complaint.status}">${complaint.status}</span><span class="status-badge">${complaint.category}</span></div>${complaint.response ? `<div><strong>Response:</strong> ${complaint.response}</div>` : ''}</div>${isAdminLoggedIn ? `<div><button class="btn-icon" onclick="openResponseModal('${complaint.id}')"><i class="fas fa-reply"></i></button><select onchange="updateComplaintStatus('${complaint.id}', this.value)"><option value="open" ${complaint.status === 'open' ? 'selected' : ''}>Open</option><option value="in-progress" ${complaint.status === 'in-progress' ? 'selected' : ''}>In Progress</option><option value="resolved" ${complaint.status === 'resolved' ? 'selected' : ''}>Resolved</option></select></div>` : ''}</div>`;
-            });
-            document.getElementById('complaintsList').innerHTML = html;
-        }
-
-        function openPublicComplaintModal() { document.getElementById('publicComplaintModal').style.display = 'flex'; }
-        function closePublicComplaintModal() { document.getElementById('publicComplaintModal').style.display = 'none'; }
-        document.getElementById('publicComplaintForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            await window.helpdeskService.submitComplaint({
-                name: document.getElementById('publicComplaintName').value,
-                category: document.getElementById('publicComplaintCategory').value,
-                title: document.getElementById('publicComplaintTitle').value,
-                description: document.getElementById('publicComplaintDescription').value,
-                response: ''
-            });
-            closePublicComplaintModal();
-            this.reset();
-        });
-
-        function openResponseModal(id) {
-            const complaint = complaints.find(c => String(c.id) === String(id));
-            if (complaint) {
-                document.getElementById('responseComplaintId').value = id;
-                document.getElementById('responseStatus').value = complaint.status;
-                document.getElementById('responseText').value = complaint.response || '';
-                document.getElementById('responseModal').style.display = 'flex';
-            }
-        }
-        function closeResponseModal() { document.getElementById('responseModal').style.display = 'none'; }
-        document.getElementById('responseForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const id = document.getElementById('responseComplaintId').value;
-            const status = document.getElementById('responseStatus').value;
-            const responseText = document.getElementById('responseText').value;
-            await window.helpdeskService.updateComplaintStatus(id, status, responseText);
-            closeResponseModal();
-        });
-        async function updateComplaintStatus(id, status) {
-            await window.helpdeskService.updateComplaintStatus(id, status);
-        }
-
-        // ==================== REPORT FUNCTIONS ====================
-        function loadReport() {
-            let html = '';
-            members.forEach(member => {
-                const memberAttendance = attendance.filter(a => a.memberId === member.id);
-                const present = memberAttendance.filter(a => a.status === 'present').length;
-                const absent = memberAttendance.filter(a => a.status === 'absent').length;
-                const excused = memberAttendance.filter(a => a.status === 'excused').length;
-                const total = memberAttendance.length;
-                const percentage = total > 0 ? Math.round((present / total) * 100) : 0;
-                const reasons = memberAttendance.filter(a => a.reason).map(a => a.reason).join('; ');
-                html += `<tr><td>${member.name}</td><td>${member.role}</td><td>${total}</td><td>${present}</td><td>${absent}</td><td>${excused}</td><td>${percentage}%</td><td>${reasons || '-'}</td></tr>`;
-            });
-            document.getElementById('reportTable').innerHTML = html;
-            
-            if (isAdminLoggedIn && !document.getElementById('downloadButtons')) {
-                const sectionHeader = document.querySelector('#reportsSection .section-header div');
-                const downloadDiv = document.createElement('div');
-                downloadDiv.id = 'downloadButtons';
-                downloadDiv.innerHTML = `<button class="btn-primary" onclick="downloadReport('pdf')"><i class="fas fa-file-pdf"></i> PDF</button><button class="btn-primary" onclick="downloadReport('excel')"><i class="fas fa-file-excel"></i> Excel</button>`;
-                sectionHeader.appendChild(downloadDiv);
-            } else if (!isAdminLoggedIn && document.getElementById('downloadButtons')) {
-                document.getElementById('downloadButtons').remove();
-            }
-        }
-
-        function downloadReport(type) {
-            if (!isAdminLoggedIn) { showNotification('Please login as admin', 'error'); return; }
-            const month = document.getElementById('reportMonth').value;
-            let content = `CAC GOOD WORKS - Monthly Report ${month}\n\n`;
-            members.forEach(member => {
-                const memberAttendance = attendance.filter(a => a.memberId === member.id && a.date.startsWith(month));
-                const present = memberAttendance.filter(a => a.status === 'present').length;
-                const total = memberAttendance.length;
-                const percentage = total > 0 ? Math.round((present / total) * 100) : 0;
-                content += `${member.name}: ${percentage}% attendance (${present}/${total})\n`;
-            });
-            const blob = new Blob([content], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `report_${month}.txt`;
-            a.click();
-            showNotification(`${type.toUpperCase()} report downloaded`, 'success');
-        }
-
-        // ==================== UTILITY ====================
-        function showNotification(message, type) {
-            const notification = document.createElement('div');
-            notification.className = `alert alert-${type}`;
-            notification.innerHTML = message;
-            document.body.appendChild(notification);
-            setTimeout(() => { notification.style.opacity = '0'; setTimeout(() => document.body.removeChild(notification), 300); }, 3000);
-        }
-
-        window.onclick = function(event) {
-            if (event.target.classList.contains('modal')) event.target.style.display = 'none';
-            if (event.target.classList.contains('lightbox-modal')) closeLightbox();
-        };
-
-        // Wait for firebase-config.js (loaded as a module) to expose the services,
-        // then start the realtime subscriptions.
-        function startApp() {
-            if (window.membersService && window.db) {
-                subscribeToRemoteData();
-                showSection('dashboard');
-            } else {
-                setTimeout(startApp, 50);
-            }
-        }
-        startApp();
-    </script>
+</div>
+
+<!-- Admin Login -->
+<div class="modal" id="adminLoginModal"><div class="modal-content">
+    <div class="modal-header"><h2><i class="fas fa-lock" style="color:var(--accent-gold);"></i> Admin Login</h2><button class="close-btn" onclick="closeAdminModal()">&times;</button></div>
+    <form id="adminLoginForm">
+        <div class="form-group"><label>Email</label><input type="email" id="adminEmail" class="form-control" placeholder="admin@example.com" autocomplete="username" required></div>
+        <div class="form-group"><label>Password</label><input type="password" id="adminPassword" class="form-control" placeholder="Enter password" autocomplete="current-password" required></div>
+        <button type="submit" class="btn-primary" style="width:100%;" id="adminLoginBtn"><i class="fas fa-sign-in-alt"></i> Login</button>
+    </form>
+</div></div>
+
+<!-- Upload Photo -->
+<div class="modal" id="uploadModal"><div class="modal-content">
+    <div class="modal-header"><h2><i class="fas fa-upload" style="color:var(--accent-gold);"></i> Upload Photo</h2><button class="close-btn" onclick="closeUploadModal()">&times;</button></div>
+    <form id="uploadForm">
+        <div class="form-group"><label>Album</label>
+            <select id="photoAlbum" class="form-control" required>
+                <option value="Gallery-Videography">Videography</option><option value="Gallery-Photography">Photography</option><option value="Gallery-SRT">SRT</option><option value="Gallery-General">General</option>
+            </select></div>
+        <div class="form-group"><label>Photo Title <span style="color:var(--danger);">*</span></label><input type="text" id="photoTitle" class="form-control" required maxlength="120"></div>
+        <div class="form-group"><label>Description</label><textarea id="photoDescription" class="form-control" rows="2" maxlength="500"></textarea></div>
+        <div class="form-group"><label>Your Name</label><input type="text" id="photoUploader" class="form-control" maxlength="80" placeholder="Who is uploading?"></div>
+        <div class="form-group"><label>Select Image <span style="color:var(--danger);">*</span></label>
+            <input type="file" id="photoImage" class="form-control" accept="image/*" required onchange="previewInto(this,'photoPreview')">
+            <div id="photoPreview" style="margin-top:1rem;text-align:center;"></div></div>
+        <button type="submit" class="btn-primary" style="width:100%;" id="uploadBtn"><i class="fas fa-cloud-upload-alt"></i> Upload to Google Drive</button>
+    </form>
+</div></div>
+
+<!-- Lightbox -->
+<div class="lightbox-modal" id="lightboxModal"><div class="lightbox-content">
+    <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+    <img class="lightbox-image" id="lightboxImage" src="" alt="">
+    <div class="lightbox-caption" id="lightboxCaption"></div>
+    <div class="lightbox-nav"><button class="lightbox-nav-btn" onclick="stepLightbox(-1)">❮</button><button class="lightbox-nav-btn" onclick="stepLightbox(1)">❯</button></div>
+</div></div>
+
+<!-- Member (admin) -->
+<div class="modal" id="memberModal"><div class="modal-content">
+    <div class="modal-header"><h2 id="memberModalTitle">Add Team Member</h2><button class="close-btn" onclick="closeMemberModal()">&times;</button></div>
+    <form id="memberForm">
+        <input type="hidden" id="memberId">
+        <div class="form-group"><label>Profile Picture (saved to Google Drive)</label>
+            <input type="file" id="memberPicture" class="form-control" accept="image/*" onchange="previewInto(this,'imagePreview',true)">
+            <div id="imagePreview" style="margin-top:.5rem;text-align:center;"></div></div>
+        <div class="form-group"><label>Full Name (with title, e.g. Sis Kalisha)</label><input type="text" id="memberName" class="form-control" required></div>
+        <div class="form-group"><label>Department</label><select id="memberRole" class="form-control" required></select></div>
+        <div class="form-group"><label>WhatsApp Number</label><input type="tel" id="memberPhone" class="form-control" placeholder="e.g. 0803 123 4567 or +234 803 123 4567"><small style="color:var(--text-secondary);">Private – only visible to admins.</small></div>
+        <div class="form-group"><label>Join Date</label><input type="date" id="memberJoinDate" class="form-control"></div>
+        <button type="submit" class="btn-primary" style="width:100%;" id="memberSaveBtn">Save Member</button>
+    </form>
+</div></div>
+
+<!-- Attendance (admin) -->
+<div class="modal" id="attendanceModal"><div class="modal-content">
+    <div class="modal-header"><h2>Mark Attendance</h2><button class="close-btn" onclick="closeAttendanceModal()">&times;</button></div>
+    <form id="attendanceForm">
+        <div class="form-group"><label>Member</label><select id="attendanceMember" class="form-control" required></select></div>
+        <div class="form-group"><label>Programme Day</label><select id="attendanceMeeting" class="form-control" required></select></div>
+        <div class="form-group"><label>Date</label><input type="date" id="attendanceDate" class="form-control" required></div>
+        <div class="form-group"><label>Status</label>
+            <select id="attendanceStatus" class="form-control" required onchange="toggleReasonField()"><option value="present">Present</option><option value="absent">Absent</option><option value="excused">Excused</option></select></div>
+        <div class="form-group" id="reasonGroup" style="display:none;"><label>Reason</label><textarea id="attendanceReason" class="form-control" rows="3"></textarea></div>
+        <button type="submit" class="btn-primary" style="width:100%;">Save Attendance</button>
+    </form>
+</div></div>
+
+<!-- Request -->
+<div class="modal" id="publicRequestModal"><div class="modal-content">
+    <div class="modal-header"><h2>Submit Request</h2><button class="close-btn" onclick="closePublicRequestModal()">&times;</button></div>
+    <form id="publicRequestForm">
+        <div class="form-group"><label>Your Name</label><input type="text" id="publicRequestName" class="form-control" required maxlength="80"></div>
+        <div class="form-group"><label>Department</label><select id="publicRequestDept" class="form-control" required></select></div>
+        <div class="form-group"><label>Request Type</label><select id="publicRequestType" class="form-control" required><option value="equipment">Equipment Request</option><option value="media">Media Request</option></select></div>
+        <div class="form-group"><label>Title</label><input type="text" id="publicRequestTitle" class="form-control" required maxlength="200"></div>
+        <div class="form-group"><label>Description</label><textarea id="publicRequestDescription" class="form-control" rows="3" required maxlength="2000"></textarea></div>
+        <div class="form-group"><label>Urgency</label><select id="publicRequestUrgency" class="form-control" required><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select></div>
+        <button type="submit" class="btn-primary" style="width:100%;">Submit Request</button>
+    </form>
+</div></div>
+
+<!-- Help desk ticket -->
+<div class="modal" id="publicComplaintModal"><div class="modal-content">
+    <div class="modal-header"><h2>New Help Desk Ticket</h2><button class="close-btn" onclick="closePublicComplaintModal()">&times;</button></div>
+    <form id="publicComplaintForm">
+        <div class="form-group"><label>Your Name</label><input type="text" id="publicComplaintName" class="form-control" required maxlength="80"></div>
+        <div class="form-group"><label>Department</label><select id="publicComplaintDept" class="form-control" required></select></div>
+        <div class="form-group"><label>Category</label><select id="publicComplaintCategory" class="form-control" required><option value="technical">Technical Issue</option><option value="equipment">Equipment Problem</option><option value="other">Other</option></select></div>
+        <div class="form-group"><label>Title</label><input type="text" id="publicComplaintTitle" class="form-control" required maxlength="200"></div>
+        <div class="form-group"><label>Description</label><textarea id="publicComplaintDescription" class="form-control" rows="3" required maxlength="2000"></textarea></div>
+        <div class="form-group"><label>Attach Picture (optional – saved to Google Drive)</label>
+            <input type="file" id="publicComplaintImage" class="form-control" accept="image/*" onchange="previewInto(this,'complaintPreview')">
+            <div id="complaintPreview" style="margin-top:.5rem;text-align:center;"></div></div>
+        <button type="submit" class="btn-primary" style="width:100%;" id="complaintSubmitBtn">Submit Ticket</button>
+    </form>
+</div></div>
+
+<!-- Response (admin) -->
+<div class="modal" id="responseModal"><div class="modal-content">
+    <div class="modal-header"><h2>Respond</h2><button class="close-btn" onclick="closeResponseModal()">&times;</button></div>
+    <form id="responseForm">
+        <input type="hidden" id="responseComplaintId">
+        <div class="form-group"><label>Status</label><select id="responseStatus" class="form-control" required><option value="open">Open</option><option value="in-progress">In Progress</option><option value="resolved">Resolved</option></select></div>
+        <div class="form-group"><label>Response / Comment</label><textarea id="responseText" class="form-control" rows="4" required></textarea></div>
+        <button type="submit" class="btn-primary" style="width:100%;">Submit Response</button>
+    </form>
+</div></div>
+
+<!-- Slot editor (admin) -->
+<div class="modal" id="slotModal"><div class="modal-content" style="max-width:640px;">
+    <div class="modal-header"><h2 id="slotModalTitle">Edit Assignment</h2><button class="close-btn" onclick="closeSlotModal()">&times;</button></div>
+    <form id="slotForm">
+        <input type="hidden" id="slotId">
+        <div class="form-group"><label>Assigned team members</label><div class="checklist" id="slotMembers"></div></div>
+        <div class="form-group"><label>Duties (one per line)</label><textarea id="slotDuties" class="form-control" rows="7"></textarea></div>
+        <button type="submit" class="btn-primary" style="width:100%;">Save Assignment</button>
+    </form>
+</div></div>
+
+<!-- Appraisal / complaint (admin) -->
+<div class="modal" id="evalModal"><div class="modal-content">
+    <div class="modal-header"><h2 id="evalModalTitle">Evaluate</h2><button class="close-btn" onclick="closeEvalModal()">&times;</button></div>
+    <form id="evalForm">
+        <input type="hidden" id="evalMemberId"><input type="hidden" id="evalSlotId">
+        <div class="form-group"><label>Day</label><select id="evalDay" class="form-control"></select></div>
+        <div class="form-group"><label>Type</label>
+            <select id="evalType" class="form-control" onchange="toggleEvalFields()"><option value="appraisal">Appraisal (commendation)</option><option value="complaint">Complaint</option></select></div>
+        <div class="form-group" id="evalRatingGroup"><label>Rating</label>
+            <select id="evalRating" class="form-control"><option value="5">★★★★★ Excellent</option><option value="4">★★★★ Very good</option><option value="3">★★★ Good</option><option value="2">★★ Fair</option><option value="1">★ Poor</option></select></div>
+        <div class="form-group" id="evalSeverityGroup" hidden><label>Severity</label>
+            <select id="evalSeverity" class="form-control"><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select></div>
+        <div class="form-group"><label>Comment</label><textarea id="evalComment" class="form-control" rows="4" required maxlength="1000" placeholder="What did they do well / what went wrong?"></textarea></div>
+        <button type="submit" class="btn-primary" style="width:100%;">Save</button>
+    </form>
+</div></div>
 </body>
 </html>
-
-
